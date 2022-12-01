@@ -1,36 +1,70 @@
-<script>
+<script lang="ts">
   import { Button, Input, Label, Spinner } from "flowbite-svelte";
+
+  import { writable } from "svelte/store";
+  import * as Realm from "realm-web";
 
   let isLoading = false;
 
-  const onSubmit = () => {
-    isLoading = true;
-    setTimeout(() => {
-      isLoading = false;
-    }, 3000);
-  };
+  export const formData = writable({
+    name: "",
+    surname: "",
+    personalId: "",
+    address: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
+  });
+
+  function onSubmit(_e) {
+    console.log($formData.name);
+  }
 </script>
 
 <h1>Register</h1>
 <div class="h-24" />
 {#if !isLoading}
-  <form>
+  <form on:submit|preventDefault={onSubmit}>
     <div class="grid gap-6 mb-6 md:grid-cols-2">
       <div>
         <Label for="name" class="mb-2 text-white">Name</Label>
-        <Input type="text" id="name" placeholder="John" required />
+        <Input
+          type="text"
+          id="name"
+          placeholder="John"
+          required
+          bind:value={$formData.name}
+        />
       </div>
       <div>
         <Label for="surname" class="mb-2 text-white">Surname</Label>
-        <Input type="text" id="surname" placeholder="Doe" required />
+        <Input
+          type="text"
+          id="surname"
+          placeholder="Doe"
+          required
+          bind:value={$formData.surname}
+        />
       </div>
       <div>
         <Label for="personalId" class="mb-2 text-white">Personal ID</Label>
-        <Input type="text" id="personalId" placeholder="981205/5578" required />
+        <Input
+          type="text"
+          id="personalId"
+          placeholder="981205/5578"
+          required
+          bind:value={$formData.personalId}
+        />
       </div>
       <div>
         <Label for="address" class="mb-2 text-white">Address</Label>
-        <Input type="text" id="address" placeholder="Na Stráni 553" required />
+        <Input
+          type="text"
+          id="address"
+          placeholder="Na Stráni 553"
+          required
+          bind:value={$formData.address}
+        />
       </div>
     </div>
     <div class="mb-6">
@@ -40,11 +74,18 @@
         id="email"
         placeholder="john.doe@company.com"
         required
+        bind:value={$formData.email}
       />
     </div>
     <div class="mb-6">
       <Label for="password" class="mb-2 text-white">Password</Label>
-      <Input type="password" id="password" placeholder="•••••••••" required />
+      <Input
+        type="password"
+        id="password"
+        placeholder="•••••••••"
+        required
+        bind:value={$formData.password}
+      />
     </div>
     <div class="mb-6">
       <Label for="confirm_password" class="mb-2 text-white"
@@ -55,6 +96,7 @@
         id="confirm_password"
         placeholder="•••••••••"
         required
+        bind:value={$formData.passwordConfirm}
       />
     </div>
     <Button type="submit" color="yellow" on:click={onSubmit}>Submit</Button>
