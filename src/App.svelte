@@ -7,8 +7,6 @@
 
 <Router>
   <header>
-    <h1>History</h1>
-
     <nav>
       <Link to="/">Home</Link>
       <Link to="login">Login</Link>
@@ -22,10 +20,6 @@
     </Route>
     <Route path="register">
       <Register />
-    </Route>
-
-    <Route path="/">
-      <h3>Library</h3>
     </Route>
   </main>
 </Router>

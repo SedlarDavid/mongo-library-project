@@ -3,6 +3,7 @@
   
     import { writable } from "svelte/store";
     import * as Realm from "realm-web";
+    import { realmApp } from "../../main";
   
     let isLoading = false;
   
@@ -11,9 +12,25 @@
       password: ""
     });
   
-    function onSubmit(_e) {
+    async function onSubmit(_e) {
       console.log($formData.email);
+
+      await loginEmailPassword($formData.email, $formData.password);
     }
+
+    async function loginEmailPassword(email, password) {
+    // Create an email/password credential
+    const credentials = Realm.Credentials.emailPassword(email, password);
+    try {
+      // Authenticate the user
+      const user = await realmApp.logIn(credentials);
+      // `App.currentUser` updates to match the logged in user
+      console.assert(user.id === realmApp.currentUser.id);
+      return user;
+    } catch (err) {
+      console.error("Failed to log in", err);
+    }
+  }
   </script>
   
   <h1>Login page</h1>
