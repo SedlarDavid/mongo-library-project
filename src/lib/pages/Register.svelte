@@ -29,26 +29,10 @@
         email,
         password,
       });
-      // let user = await loginEmailPassword(email, password);
-      // console.log("Successfully logged in!", user);
     } catch (err) {
       console.error("Failed to log in", err);
     }
   }
-
-  // async function loginEmailPassword(email, password) {
-  //   // Create an email/password credential
-  //   const credentials = Realm.Credentials.emailPassword(email, password);
-  //   try {
-  //     // Authenticate the user
-  //     const user = await realmApp.logIn(credentials);
-  //     // `App.currentUser` updates to match the logged in user
-  //     console.assert(user.id === realmApp.currentUser.id);
-  //     return user;
-  //   } catch (err) {
-  //     console.error("Failed to log in", err);
-  //   }
-  // }
 </script>
 
 <h1 class="text-black">Register</h1>
