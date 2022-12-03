@@ -28,6 +28,7 @@
     "vite": "^3.2.3"
   },
   "dependencies": {
-    "realm-web": "^2.0.0"
+    "realm-web": "^2.0.0",
+    "svelte-navigator": "^3.2.2"
   }
 }
