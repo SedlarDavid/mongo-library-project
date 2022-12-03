@@ -51,7 +51,7 @@
   // }
 </script>
 
-<h1>Register</h1>
+<h1 class="text-black">Register</h1>
 <div class="h-24" />
 {#if !isLoading}
   <form on:submit|preventDefault={onSubmit}>
