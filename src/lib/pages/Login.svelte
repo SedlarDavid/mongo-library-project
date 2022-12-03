@@ -18,7 +18,7 @@
       await loginEmailPassword($formData.email, $formData.password);
     }
 
-    async function loginEmailPassword(email, password) {
+    export async function loginEmailPassword(email, password) {
     // Create an email/password credential
     const credentials = Realm.Credentials.emailPassword(email, password);
     try {
