@@ -4,6 +4,11 @@
   import { writable } from "svelte/store";
   import * as Realm from "realm-web";
   import { realmApp } from "../../main";
+  import { Constants, MongoCollections } from "../../Constants";
+
+  const {
+    BSON: { ObjectId },
+  } = Realm;
 
   let isLoading = false;
 
@@ -19,8 +24,7 @@
 
   async function onSubmit(_e) {
     console.log($formData.name);
-
-    await registerEmailPassword($formData.email, $formData.password);
+     await registerEmailPassword($formData.email, $formData.password);
   }
 
   async function registerEmailPassword(email, password) {
@@ -29,26 +33,45 @@
         email,
         password,
       });
-      // let user = await loginEmailPassword(email, password);
-      // console.log("Successfully logged in!", user);
+      let user = await loginEmailPassword(email, password);
+      console.log("Successfully logged in!", user);
+      createUserData();
     } catch (err) {
       console.error("Failed to log in", err);
     }
   }
 
-  // async function loginEmailPassword(email, password) {
-  //   // Create an email/password credential
-  //   const credentials = Realm.Credentials.emailPassword(email, password);
-  //   try {
-  //     // Authenticate the user
-  //     const user = await realmApp.logIn(credentials);
-  //     // `App.currentUser` updates to match the logged in user
-  //     console.assert(user.id === realmApp.currentUser.id);
-  //     return user;
-  //   } catch (err) {
-  //     console.error("Failed to log in", err);
-  //   }
-  // }
+  async function createUserData() {
+    const mongo = realmApp.currentUser.mongoClient(
+      import.meta.env.VITE_DATA_SOURCE_NAME
+    );
+    const users = mongo
+      .db(Constants.DatabaseName)
+      .collection(MongoCollections.Users);
+
+    const result = await users.insertOne({
+      name: "lily of the valley",
+      sunlight: "full",
+      color: "white",
+      type: "perennial",
+      _partition: "Store 47",
+    });
+    console.log(result);
+  }
+
+  async function loginEmailPassword(email, password) {
+    // Create an email/password credential
+    const credentials = Realm.Credentials.emailPassword(email, password);
+    try {
+      // Authenticate the user
+      const user = await realmApp.logIn(credentials);
+      // `App.currentUser` updates to match the logged in user
+      console.assert(user.id === realmApp.currentUser.id);
+      return user;
+    } catch (err) {
+      console.error("Failed to log in", err);
+    }
+  }
 </script>
 
 <h1 class="text-black">Register</h1>
