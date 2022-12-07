@@ -3,6 +3,7 @@
 
   import Register from "./lib/pages/Register.svelte";
   import Login from "./lib/pages/Login.svelte";
+  import Administration from "./lib/pages/administration/Administration.svelte";
 </script>
 
 <Router>
@@ -11,6 +12,7 @@
       <Link to="/">Home</Link>
       <Link to="login">Login</Link>
       <Link to="register">Register</Link>
+      <Link to="administration">Administration</Link>
     </nav>
   </header>
 
@@ -20,6 +22,9 @@
     </Route>
     <Route path="register">
       <Register />
+    </Route>
+    <Route path="administration">
+      <Administration />
     </Route>
   </main>
 </Router>
