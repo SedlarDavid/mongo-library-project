@@ -1,10 +1,10 @@
 <script lang="ts">
   import { Button, Input, Label, Spinner } from "flowbite-svelte";
 
-  import { writable } from "svelte/store";
   import * as Realm from "realm-web";
   import { realmApp } from "../../main";
   import { Constants, MongoCollections } from "../../Constants";
+  import { UserData, registerUserFormData } from "../models/UserData";
 
   const {
     BSON: { ObjectId },
@@ -12,19 +12,13 @@
 
   let isLoading = false;
 
-  export const formData = writable({
-    name: "",
-    surname: "",
-    personalId: "",
-    address: "",
-    email: "",
-    password: "",
-    passwordConfirm: "",
-  });
-
   async function onSubmit(_e) {
-    console.log($formData.name);
-     await registerEmailPassword($formData.email, $formData.password);
+    isLoading = true;
+    await registerEmailPassword(
+      $registerUserFormData.email,
+      $registerUserFormData.password
+    );
+    //TODO redirect
   }
 
   async function registerEmailPassword(email, password) {
@@ -34,8 +28,23 @@
         password,
       });
       let user = await loginEmailPassword(email, password);
-      console.log("Successfully logged in!", user);
+      console.log("Successfully logged in!");
       createUserData();
+    } catch (err) {
+      console.error("Failed to log in", err);
+    }
+  }
+
+  //TODO on login ?
+  async function loginEmailPassword(email, password) {
+    // Create an email/password credential
+    const credentials = Realm.Credentials.emailPassword(email, password);
+    try {
+      // Authenticate the user
+      const user = await realmApp.logIn(credentials);
+      // `App.currentUser` updates to match the logged in user
+      console.assert(user.id === realmApp.currentUser.id);
+      return user;
     } catch (err) {
       console.error("Failed to log in", err);
     }
@@ -49,28 +58,9 @@
       .db(Constants.DatabaseName)
       .collection(MongoCollections.Users);
 
-    const result = await users.insertOne({
-      name: "lily of the valley",
-      sunlight: "full",
-      color: "white",
-      type: "perennial",
-      _partition: "Store 47",
-    });
-    console.log(result);
-  }
-
-  async function loginEmailPassword(email, password) {
-    // Create an email/password credential
-    const credentials = Realm.Credentials.emailPassword(email, password);
-    try {
-      // Authenticate the user
-      const user = await realmApp.logIn(credentials);
-      // `App.currentUser` updates to match the logged in user
-      console.assert(user.id === realmApp.currentUser.id);
-      return user;
-    } catch (err) {
-      console.error("Failed to log in", err);
-    }
+    const result = await users.insertOne(
+      UserData.fromFormData($registerUserFormData)
+    );
   }
 </script>
 
@@ -86,7 +76,7 @@
           id="name"
           placeholder="John"
           required
-          bind:value={$formData.name}
+          bind:value={$registerUserFormData.name}
         />
       </div>
       <div>
@@ -96,7 +86,7 @@
           id="surname"
           placeholder="Doe"
           required
-          bind:value={$formData.surname}
+          bind:value={$registerUserFormData.surname}
         />
       </div>
       <div>
@@ -106,7 +96,7 @@
           id="personalId"
           placeholder="981205/5578"
           required
-          bind:value={$formData.personalId}
+          bind:value={$registerUserFormData.personalId}
         />
       </div>
       <div>
@@ -116,7 +106,7 @@
           id="address"
           placeholder="Na Stráni 553"
           required
-          bind:value={$formData.address}
+          bind:value={$registerUserFormData.address}
         />
       </div>
     </div>
@@ -127,7 +117,7 @@
         id="email"
         placeholder="john.doe@company.com"
         required
-        bind:value={$formData.email}
+        bind:value={$registerUserFormData.email}
       />
     </div>
     <div class="mb-6">
@@ -137,7 +127,7 @@
         id="password"
         placeholder="•••••••••"
         required
-        bind:value={$formData.password}
+        bind:value={$registerUserFormData.password}
       />
     </div>
     <div class="mb-6">
@@ -149,7 +139,7 @@
         id="confirm_password"
         placeholder="•••••••••"
         required
-        bind:value={$formData.passwordConfirm}
+        bind:value={$registerUserFormData.passwordConfirm}
       />
     </div>
     <Button type="submit" color="yellow" on:click={onSubmit}>Submit</Button>
