@@ -27,7 +27,7 @@
         email,
         password,
       });
-      let user = await loginEmailPassword(email, password);
+      await loginEmailPassword(email, password);
       console.log("Successfully logged in!");
       createUserData();
     } catch (err) {
