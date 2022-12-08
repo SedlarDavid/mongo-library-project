@@ -1,4 +1,4 @@
 export enum AccountState {
-  Active,
-  Inactive,
-}
+    Active,
+    Inactive,
+  }
