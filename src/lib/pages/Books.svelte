@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    Avatar,
     Button,
     ButtonGroup,
     Input,
@@ -98,7 +99,7 @@
   function updateBooks(): void {
     switch (selectedSection) {
       case "Borrowed":
-        renderBooks = books.filter(b => isBorrowed(b));
+        renderBooks = books.filter((b) => isBorrowed(b));
         break;
       case "History":
         break;
@@ -165,8 +166,8 @@
             {book.releaseYear}</TableBodyCell
           >
           <TableBodyCell>
-            {book.img}</TableBodyCell
-          >
+            <Avatar src={book.img} rounded/>
+          </TableBodyCell>
           <TableBodyCell>
             {book.availableCount}
           </TableBodyCell>
