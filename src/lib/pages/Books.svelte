@@ -23,6 +23,7 @@
 
   let isLoading = true;
   var user: UserData;
+  var selectedSection: String = "All";
   const {
     BSON: { ObjectId },
   } = Realm;
@@ -34,6 +35,7 @@
   });
 
   var books = new Array<Book>();
+  var renderBooks = new Array<Book>();
   var borrowings = new Array<Borrowing>();
 
   async function getBooks() {
@@ -45,6 +47,7 @@
       .collection(MongoCollections.Books);
     const result = (await data.find()) as Book[];
     books = result;
+    renderBooks = books;
     isLoading = false;
   }
   async function getBorrowings() {
@@ -86,6 +89,25 @@
   function onSearchChanged(e): void {
     console.log(e.target.value);
   }
+
+  function onSectionChanged(section: String) {
+    selectedSection = section;
+    updateBooks();
+  }
+
+  function updateBooks(): void {
+    switch (selectedSection) {
+      case "Borrowed":
+        renderBooks = books.filter(b => isBorrowed(b));
+        break;
+      case "History":
+        break;
+
+      default:
+        renderBooks = books;
+        break;
+    }
+  }
 </script>
 
 <div class="flex flex-row justify-between">
@@ -93,9 +115,18 @@
 </div>
 <div class="h-12" />
 <ButtonGroup>
-  <Button>All</Button>
-  <Button>Borrowed</Button>
-  <Button>History</Button>
+  <Button
+    color={selectedSection === "All" ? "blue" : "light"}
+    on:click={() => onSectionChanged("All")}>All</Button
+  >
+  <Button
+    color={selectedSection === "Borrowed" ? "blue" : "light"}
+    on:click={() => onSectionChanged("Borrowed")}>Borrowed</Button
+  >
+  <Button
+    color={selectedSection === "History" ? "blue" : "light"}
+    on:click={() => onSectionChanged("History")}>History</Button
+  >
 </ButtonGroup>
 <div>
   <div class="h-12" />
@@ -119,7 +150,7 @@
       <TableHeadCell>Borrowed count</TableHeadCell>
     </TableHead>
     <TableBody class="divide-y">
-      {#each books as book}
+      {#each renderBooks as book}
         <TableBodyRow trClass={isBorrowed(book) ? "bg-green-200" : ""}>
           <TableBodyCell>
             {book.name}
