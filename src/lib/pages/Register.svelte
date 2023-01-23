@@ -44,6 +44,7 @@
       const user = await realmApp.logIn(credentials);
       // `App.currentUser` updates to match the logged in user
       console.assert(user.id === realmApp.currentUser.id);
+      $registerUserFormData.personalId = user.id;
       return user;
     } catch (err) {
       console.error("Failed to log in", err);
