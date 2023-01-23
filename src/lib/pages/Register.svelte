@@ -4,7 +4,7 @@
   import * as Realm from "realm-web";
   import { realmApp } from "../../main";
   import { Constants, MongoCollections } from "../../Constants";
-  import { UserData, registerUserFormData } from "../models/UserData";
+  import { UserData, registerUserFormData } from "../models/UserData/UserData";
 
   const {
     BSON: { ObjectId },
