@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
-import type { AccountRole } from "../../enums/AccountRole";
-import type { AccountState } from "../../enums/AccountState";
+import { AccountRole } from "../../enums/AccountRole";
+import { AccountState } from "../../enums/AccountState";
 
 interface IRegisterUserFormData {
   name: string;

@@ -4,6 +4,7 @@
   import Register from "./lib/pages/Register.svelte";
   import Login from "./lib/pages/Login.svelte";
   import Administration from "./lib/pages/administration/Administration.svelte";
+  import Books from "./lib/pages/Books.svelte";
 </script>
 
 <Router>
@@ -17,6 +18,9 @@
   </header>
 
   <main>
+    <Route path="/">
+      <Books />
+    </Route>
     <Route path="login">
       <Login />
     </Route>
