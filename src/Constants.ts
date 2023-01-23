@@ -5,4 +5,5 @@ export class Constants {
   export class MongoCollections {
     static Users = "users";
     static Books = "books";
+    static Borrowings = "borrowings";
   }

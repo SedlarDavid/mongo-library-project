@@ -1,4 +1,5 @@
 export class Book {
+  _id: string;
   name: string;
   author: string;
   pagesCount: number;
@@ -8,6 +9,7 @@ export class Book {
   borrowedCount: number;
 
   constructor(
+    _id: string,
     name: string,
     author: string,
     pagesCount: number,
@@ -16,6 +18,7 @@ export class Book {
     availableCount: number,
     borrowedCount: number
   ) {
+    this._id = _id;
     this.name = name;
     this.author = author;
     this.pagesCount = pagesCount;
