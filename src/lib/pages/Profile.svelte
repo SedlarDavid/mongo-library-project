@@ -47,14 +47,33 @@
       .db(Constants.DatabaseName)
       .collection(MongoCollections.Users);
     const result = (await data.find()) as UserData[];
-    user = result.find(
-      (user) => user.email === realmApp.currentUser.profile.email
-    );
+    user = result.find((user) => user.personalId === realmApp.currentUser.id);
     isLoading = false;
   }
 
   function onSaveAll(e: MouseEvent): void {
-    throw new Error('Function not implemented.');
+    const mongo = realmApp.currentUser.mongoClient(
+      import.meta.env.VITE_DATA_SOURCE_NAME
+    );
+
+    const data = mongo
+      .db(Constants.DatabaseName)
+      .collection(MongoCollections.Users)
+      .updateOne(
+        { personalId: realmApp.currentUser.id },
+        {
+          $set: {
+            name: user.name,
+            surname: user.surname,
+            nationalIdNumber: user.nationalIdNumber,
+            nickname: user.nickname,
+            email: user.email,
+            address: user.address,
+            accountState: 1,
+          },
+        }
+      );
+    location.reload();
   }
 </script>
 
@@ -70,6 +89,7 @@
     <TableHead>
       <TableHeadCell>Name</TableHeadCell>
       <TableHeadCell>Surname</TableHeadCell>
+      <TableHeadCell>National ID Number</TableHeadCell>
       <TableHeadCell>Nickname</TableHeadCell>
       <TableHeadCell>Email</TableHeadCell>
       <TableHeadCell>Address</TableHeadCell>
@@ -93,6 +113,15 @@
             placeholder="Surname"
             required
             bind:value={user.surname}
+          /></TableBodyCell
+        >
+        <TableBodyCell>
+          <Input
+            type="text"
+            id="nationalIdNumber"
+            placeholder="National ID Number"
+            required
+            bind:value={user.nationalIdNumber}
           /></TableBodyCell
         >
         <TableBodyCell>
