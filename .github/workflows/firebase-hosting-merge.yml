@@ -9,10 +9,10 @@ name: Deploy to Firebase Hosting on merge
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    env:
+      VITE_ATLAS_CLIENT: "${{ secrets.VITE_ATLAS_CLIENT }}"
+      VITE_DATA_SOURCE_NAME: "${{ secrets.VITE_DATA_SOURCE_NAME }}"
     steps:
-        env:
-          VITE_ATLAS_CLIENT: "${{ secrets.VITE_ATLAS_CLIENT }}"
-          VITE_DATA_SOURCE_NAME: "${{ secrets.VITE_DATA_SOURCE_NAME }}"
       - name: 'Create env file'
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env.production
