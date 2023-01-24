@@ -89,7 +89,28 @@
   }
 
   function onSearchChanged(e): void {
-    console.log(e.target.value);
+
+    if (!e.target.value) {
+      updateBooks();
+    } else {
+      switch (selectedSection) {
+        case "Borrowed":
+          renderBooks = books.filter(
+            (b) =>
+              isBorrowed(b) &&
+              b.name.toLowerCase().includes(e.target.value.toLowerCase())
+          );
+          break;
+        case "History":
+          break;
+
+        default:
+          renderBooks = books.filter((b) =>
+            b.name.toLowerCase().includes(e.target.value.toLowerCase())
+          );
+          break;
+      }
+    }
   }
 
   function onSectionChanged(section: String) {
