@@ -23,6 +23,8 @@
   import type { Borrowing } from "../models/Borrowings/Borrowing";
   import BookRow from "../components/Books/BookRow.svelte";
   import type { Writable } from "svelte/store";
+  import { notifications } from "../tools/notifications";
+  import Toast from "../components/Toast.svelte";
 
   let isLoading = true;
   var user: UserData;
@@ -70,7 +72,9 @@
   }
 
   function onBorrowBook(book: Book): void {
-    throw new Error("Function not implemented.");
+    if (book.availableCount === 0) {
+      notifications.warning("No books left to borrow!", 3000);
+    }
   }
   function isBorrowed(book: Book): boolean {
     return (
@@ -184,3 +188,5 @@
 {:else}
   <Spinner />
 {/if}
+
+<Toast />
