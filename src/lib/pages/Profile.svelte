@@ -73,7 +73,7 @@
           },
         }
       );
-    location.reload();
+    console.log(user.nickname);
   }
 </script>
 
