@@ -11,11 +11,9 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build
         env:
-          VITE_DATA_SOURCE_NAME: ${{ env.VITE_DATA_SOURCE_NAME }}
-        run: |
-          echo "var 1 $VITE_DATA_SOURCE_NAME"
-          echo "var 1 ${{ env.VITE_DATA_SOURCE_NAME }}"
-          npm ci && npm run build
+          VITE_ATLAS_CLIENT: '${{ secrets.VITE_ATLAS_CLIENT }}'
+          VITE_DATA_SOURCE_NAME: '${{ secrets.VITE_DATA_SOURCE_NAME }}'
+        run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'

@@ -21,13 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Create .env file
-        uses: SpicyPizza/create-envfile@v1
-        with:
-          envkey_VITE_ATLAS_CLIENT: ${{ secrets.VITE_ATLAS_CLIENT }}
-          envkey_VITE_DATA_SOURCE_NAME: ${{ secrets.VITE_DATA_SOURCE_NAME }}
-          file_name: .env.production
       - name: Build
+        env:
+          VITE_ATLAS_CLIENT: '${{ secrets.VITE_ATLAS_CLIENT }}'
+          VITE_DATA_SOURCE_NAME: '${{ secrets.VITE_DATA_SOURCE_NAME }}'
         run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
