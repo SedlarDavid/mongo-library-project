@@ -6,4 +6,5 @@ export class Constants {
     static Users = "users";
     static Books = "books";
     static Borrowings = "borrowings";
+    static BorrowHistory = "borrowHistory";
   }

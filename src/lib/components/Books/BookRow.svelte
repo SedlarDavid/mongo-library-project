@@ -12,6 +12,7 @@
 
   export let book: Book;
   export let canEdit: boolean = false;
+  export let isHistory: boolean = false;
   export let onBorrowOrReturnBook: (id: string, data: IBook) => void;
   export let onSaveEdit: (id: string, data: IBook) => void;
   export let isBorrowed: (book: Book) => boolean;
@@ -87,41 +88,43 @@
   <TableBodyCell>
     <Avatar src={$bookFormData.img} rounded />
   </TableBodyCell>
-  <TableBodyCell>
-    {#if canEdit}
-      <Input
-        type="text"
-        id="availableCount"
-        placeholder="5"
-        required
-        bind:value={$bookFormData.availableCount}
-      />
-    {:else}
-      {book.availableCount}
-    {/if}
-  </TableBodyCell>
-  <TableBodyCell>
-    {#if canEdit}
-      <Input
-        type="text"
-        id="borrowedCount"
-        placeholder="5"
-        required
-        bind:value={$bookFormData.borrowedCount}
-      />
-    {:else}
-      {book.borrowedCount}
-    {/if}
-  </TableBodyCell>
-  <TableBodyCell>
-    <Button
-      color={isBorrowed(book) ? "red" : "green"}
-      outline={true}
-      on:click={canEdit
-        ? () => onSaveEdit(book._id, $bookFormData)
-        : () => onBorrowOrReturnBook(book._id, $bookFormData)}
-      pill={true}
-      >{canEdit ? "Save" : isBorrowed(book) ? "Return" : "Borrow"}</Button
-    >
-  </TableBodyCell>
+  {#if !isHistory}
+    <TableBodyCell>
+      {#if canEdit}
+        <Input
+          type="text"
+          id="availableCount"
+          placeholder="5"
+          required
+          bind:value={$bookFormData.availableCount}
+        />
+      {:else}
+        {book.availableCount}
+      {/if}
+    </TableBodyCell>
+    <TableBodyCell>
+      {#if canEdit}
+        <Input
+          type="text"
+          id="borrowedCount"
+          placeholder="5"
+          required
+          bind:value={$bookFormData.borrowedCount}
+        />
+      {:else}
+        {book.borrowedCount}
+      {/if}
+    </TableBodyCell>
+    <TableBodyCell>
+      <Button
+        color={isBorrowed(book) ? "red" : "green"}
+        outline={true}
+        on:click={canEdit
+          ? () => onSaveEdit(book._id, $bookFormData)
+          : () => onBorrowOrReturnBook(book._id, $bookFormData)}
+        pill={true}
+        >{canEdit ? "Save" : isBorrowed(book) ? "Return" : "Borrow"}</Button
+      >
+    </TableBodyCell>
+  {/if}
 </TableBodyRow>

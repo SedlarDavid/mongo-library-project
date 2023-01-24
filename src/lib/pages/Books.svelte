@@ -24,8 +24,9 @@
   import { notifications } from "../tools/notifications";
   import Toast from "../components/Toast.svelte";
   import { BooksRepository } from "../repositories/BooksRepository";
-  import type { Book, IBook } from "../models/Books/Book";
-  import type { Borrowing } from "../models/Borrowings/Borrowing";
+  import { Book, type IBook } from "../models/Books/Book";
+  import type { Borrow } from "../models/Borrowings/Borrow";
+  import type { Return } from "../models/Borrowings/Return";
 
   let isLoading = true;
   var user: UserData;
@@ -37,31 +38,36 @@
   onMount(async () => {
     await getCurrentUser();
     await getBorrowings();
+    await getReturns();
     await getBooks();
   });
 
   var books = new Array<Book>();
   var renderBooks = new Array<Book>();
-  var borrowings = new Array<Borrowing>();
+  var borrowings = new Array<Borrow>();
+  var returns = new Array<Return>();
 
   async function getBooks() {
-    const data = mongo
-      .collection(MongoCollections.Books);
+    const data = mongo.collection(MongoCollections.Books);
     const result = (await data.find()) as Book[];
     books = result;
     renderBooks = books;
     isLoading = false;
   }
   async function getBorrowings() {
-    const data = mongo
-      .collection(MongoCollections.Borrowings);
-    const result = (await data.find()) as Borrowing[];
+    //TODO user filter
+    const data = mongo.collection(MongoCollections.Borrowings);
+    const result = (await data.find()) as Borrow[];
     borrowings = result;
   }
-
+  async function getReturns() {
+    //TODO user filter
+    const data = mongo.collection(MongoCollections.BorrowHistory);
+    const result = (await data.find()) as Return[];
+    returns = result;
+  }
   async function getCurrentUser() {
-    const data = mongo
-      .collection(MongoCollections.Users);
+    const data = mongo.collection(MongoCollections.Users);
     const result = (await data.find()) as UserData[];
     user = result.find((u) => u.personalId === realmApp.currentUser.id);
   }
@@ -128,12 +134,37 @@
         renderBooks = books.filter((b) => isBorrowed(b));
         break;
       case "History":
+        let returnedBooks = getReturnedBooks();
+        renderBooks = returnedBooks;
         break;
 
       default:
         renderBooks = books;
         break;
     }
+  }
+
+  function getReturnedBooks(): Array<Book> {
+    let arr = new Array<Book>();
+    for (let i = 0; i < returns.length; i++) {
+      let book = books.find(
+        (b) => b._id.toString() === returns[i].bookId.toString()
+      );
+
+      arr.push(
+        new Book(
+          book._id,
+          book.name,
+          book.author,
+          book.pagesCount,
+          book.releaseYear,
+          book.img,
+          book.availableCount,
+          book.borrowedCount
+        )
+      );
+    }
+    return arr;
   }
 </script>
 
@@ -173,8 +204,10 @@
       <TableHeadCell>Pages count</TableHeadCell>
       <TableHeadCell>Release year</TableHeadCell>
       <TableHeadCell>Image</TableHeadCell>
-      <TableHeadCell>Available count</TableHeadCell>
-      <TableHeadCell>Borrowed count</TableHeadCell>
+      {#if selectedSection !== "History"}
+        <TableHeadCell>Available count</TableHeadCell>
+        <TableHeadCell>Borrowed count</TableHeadCell>
+      {/if}
     </TableHead>
     <TableBody class="divide-y">
       {#each renderBooks as book}
@@ -184,6 +217,7 @@
           {onBorrowOrReturnBook}
           {onSaveEdit}
           {isBorrowed}
+          isHistory={ selectedSection === "History"}
         />
       {/each}
     </TableBody>
