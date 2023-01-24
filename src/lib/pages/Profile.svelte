@@ -36,9 +36,7 @@
     await getUser();
   });
 
-  var users = new Array<UserData>();
-
-  var currentUser = realmApp.currentUser.profile.name;
+  var user: UserData;
 
   async function getUser() {
     const mongo = realmApp.currentUser.mongoClient(
@@ -47,11 +45,11 @@
 
     const data = mongo
       .db(Constants.DatabaseName)
-      .collection(MongoCollections.Users)
-      .findOne({ name: currentUser });
-    const result = (await data) as UserData[];
-    console.log(currentUser);
-    users = result;
+      .collection(MongoCollections.Users);
+    const result = (await data.find()) as UserData[];
+    user = result.find(
+      (user) => user.email === realmApp.currentUser.profile.email
+    );
     isLoading = false;
   }
 
@@ -61,7 +59,7 @@
 </script>
 
 <div class="flex flex-row justify-between">
-  <h1 class="text-black">Users profile</h1>
+  <h1 class="text-black">My profile</h1>
   <ButtonGroup>
     <Button on:click={onSaveAll}>Save all</Button>
   </ButtonGroup>
@@ -75,7 +73,6 @@
       <TableHeadCell>Nickname</TableHeadCell>
       <TableHeadCell>Email</TableHeadCell>
       <TableHeadCell>Address</TableHeadCell>
-      <TableHeadCell>Role</TableHeadCell>
       <TableHeadCell>Account state</TableHeadCell>
     </TableHead>
     <TableBody class="divide-y">
@@ -86,7 +83,7 @@
             id="name"
             placeholder="Name"
             required
-            bind:value={users[0].name}
+            bind:value={user.name}
           />
         </TableBodyCell>
         <TableBodyCell>
@@ -95,7 +92,7 @@
             id="surname"
             placeholder="Surname"
             required
-            bind:value={users[0].surname}
+            bind:value={user.surname}
           /></TableBodyCell
         >
         <TableBodyCell>
@@ -104,7 +101,7 @@
             id="nickname"
             placeholder="Nickname"
             required
-            bind:value={users[0].nickname}
+            bind:value={user.nickname}
           /></TableBodyCell
         >
         <TableBodyCell>
@@ -113,7 +110,7 @@
             id="email"
             placeholder="Email"
             required
-            bind:value={users[0].email}
+            bind:value={user.email}
           /></TableBodyCell
         >
         <TableBodyCell>
@@ -122,12 +119,13 @@
             id="address"
             placeholder="Address"
             required
-            bind:value={users[0].address}
+            bind:value={user.address}
           /></TableBodyCell
         >
-        <TableBodyCell />
-        <TableBodyCell>{AccountState[users[0].accountState]}</TableBodyCell>
+        <TableBodyCell>{AccountState[user.accountState]}</TableBodyCell>
       </TableBodyRow>
+
+      <TableBodyRow />
     </TableBody>
   </Table>
 {:else}
