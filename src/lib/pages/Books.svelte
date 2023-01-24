@@ -16,12 +16,13 @@
   import { onMount } from "svelte";
   import { Constants, MongoCollections } from "../../Constants";
   import { realmApp } from "../../main";
-  import type { Book } from "../models/Books/Book";
+  import { Book, type IBook } from "../models/Books/Book";
   import * as Realm from "realm-web";
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
   import type { Borrowing } from "../models/Borrowings/Borrowing";
   import BookRow from "../components/Books/BookRow.svelte";
+  import type { Writable } from "svelte/store";
 
   let isLoading = true;
   var user: UserData;
@@ -39,11 +40,11 @@
   var books = new Array<Book>();
   var renderBooks = new Array<Book>();
   var borrowings = new Array<Borrowing>();
+  const mongo = realmApp.currentUser.mongoClient(
+    import.meta.env.VITE_DATA_SOURCE_NAME
+  );
 
   async function getBooks() {
-    const mongo = realmApp.currentUser.mongoClient(
-      import.meta.env.VITE_DATA_SOURCE_NAME
-    );
     const data = mongo
       .db(Constants.DatabaseName)
       .collection(MongoCollections.Books);
@@ -53,9 +54,6 @@
     isLoading = false;
   }
   async function getBorrowings() {
-    const mongo = realmApp.currentUser.mongoClient(
-      import.meta.env.VITE_DATA_SOURCE_NAME
-    );
     const data = mongo
       .db(Constants.DatabaseName)
       .collection(MongoCollections.Borrowings);
@@ -64,9 +62,6 @@
   }
 
   async function getCurrentUser() {
-    const mongo = realmApp.currentUser.mongoClient(
-      import.meta.env.VITE_DATA_SOURCE_NAME
-    );
     const data = mongo
       .db(Constants.DatabaseName)
       .collection(MongoCollections.Users);
@@ -84,12 +79,14 @@
       ) !== undefined
     );
   }
-  function onEditBook(book: Book): void {
-    throw new Error("Function not implemented.");
+  function onSaveEdit(id: string, data: IBook): void {
+    mongo
+      .db(Constants.DatabaseName)
+      .collection(MongoCollections.Books)
+      .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
   }
 
   function onSearchChanged(e): void {
-
     if (!e.target.value) {
       updateBooks();
     } else {
@@ -178,7 +175,7 @@
           {book}
           canEdit={user.role === AccountRole.Admin}
           {onBorrowBook}
-          onSaveEdit={onEditBook}
+          {onSaveEdit}
           {isBorrowed}
         />
       {/each}
