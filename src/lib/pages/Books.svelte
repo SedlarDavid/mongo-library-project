@@ -20,6 +20,7 @@
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
   import BookRow from "../components/Books/BookRow.svelte";
+  import NewBookRow from "../components/Books/NewBookRow.svelte";
   import type { Writable } from "svelte/store";
   import { notifications } from "../tools/notifications";
   import Toast from "../components/Toast.svelte";
@@ -173,7 +174,7 @@
       (b) => b.bookId.toString() === book._id.toString()
     );
 
-    if(!bor) return "";
+    if (!bor) return "";
 
     let returnDate = addDays(bor.borrowDate, 6);
 
@@ -191,6 +192,25 @@
       .sort((a, b) => b.returnDate.getDate() - a.returnDate.getDate());
 
     return ret.at(0).returnDate.toLocaleDateString("en-US");
+  }
+
+  async function onAddBook(data: IBook): Promise<void> {
+    isLoading = true;
+    let newBook = new Book(
+      data._id,
+      data.name,
+      data.author,
+      data.pagesCount,
+      data.releaseYear,
+      data.img,
+      data.availableCount,
+      data.borrowedCount
+    );
+    let id = await BooksRepository.addBook(newBook);
+    newBook._id = id.toString();
+    books.push(newBook);
+    isLoading = false;
+    updateBooks();
   }
 </script>
 
@@ -253,6 +273,9 @@
           {getBookReturnDate}
         />
       {/each}
+      {#if user.role === AccountRole.Admin}
+        <NewBookRow {onAddBook} />
+      {/if}
     </TableBody>
   </Table>
 {:else}
