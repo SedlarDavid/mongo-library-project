@@ -7,7 +7,7 @@
 #### Books catalog - @SedlarDavd
 - [x] Librarian - edit books data
 - [x] Librarian - delete books
-- [ ] Librarian - add books
+- [x] Librarian - add books
 - [x] User - borrow books
 - [x] User - borrow books
 - [x] Visible expiration
