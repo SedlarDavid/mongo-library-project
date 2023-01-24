@@ -21,6 +21,7 @@
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
   import type { Borrowing } from "../models/Borrowings/Borrowing";
+  import BookRow from "../components/Books/BookRow.svelte";
 
   let isLoading = true;
   var user: UserData;
@@ -152,59 +153,13 @@
     </TableHead>
     <TableBody class="divide-y">
       {#each renderBooks as book}
-        <TableBodyRow trClass={isBorrowed(book) ? "bg-green-200" : ""}>
-          <TableBodyCell>
-            {book.name}
-          </TableBodyCell>
-          <TableBodyCell>
-            {book.author}
-          </TableBodyCell>
-          <TableBodyCell>
-            {book.pagesCount}</TableBodyCell
-          >
-          <TableBodyCell>
-            {book.releaseYear}</TableBodyCell
-          >
-          <TableBodyCell>
-            <Avatar src={book.img} rounded/>
-          </TableBodyCell>
-          <TableBodyCell>
-            {book.availableCount}
-          </TableBodyCell>
-          <TableBodyCell>{book.borrowedCount}</TableBodyCell>
-          <TableBodyCell>
-            <Button on:click={() => onBorrowBook(book)} pill={true} class="!p-2"
-              ><svg
-                aria-hidden="true"
-                class="w-4 h-4"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-                ><path
-                  fill-rule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
-                /></svg
-              ></Button
-            >
-            {#if user.role === AccountRole.Admin}
-              <Button on:click={() => onEditBook(book)} pill={true} class="!p-2"
-                ><svg
-                  aria-hidden="true"
-                  class="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                  ><path
-                    fill-rule="evenodd"
-                    d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                    clip-rule="evenodd"
-                  /></svg
-                ></Button
-              >
-            {/if}
-          </TableBodyCell>
-        </TableBodyRow>
+        <BookRow
+          {book}
+          canEdit={user.role === AccountRole.Admin}
+          {onBorrowBook}
+          onSaveEdit={onEditBook}
+          {isBorrowed}
+        />
       {/each}
     </TableBody>
   </Table>
