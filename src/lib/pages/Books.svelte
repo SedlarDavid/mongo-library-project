@@ -166,6 +166,32 @@
     }
     return arr;
   }
+
+  //TODO handle via CRON/Function/trigger
+  function getBookExpirationDate(book: Book): string {
+    let bor = borrowings.find(
+      (b) => b.bookId.toString() === book._id.toString()
+    );
+
+    if(!bor) return "";
+
+    let returnDate = addDays(bor.borrowDate, 6);
+
+    return returnDate.toLocaleDateString("en-US");
+  }
+
+  function addDays(date: Date, days) {
+    var result = new Date(date.toUTCString());
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+  function getBookReturnDate(book: Book): string {
+    let ret = returns
+      .filter((r) => r.bookId.toString() === book._id.toString())
+      .sort((a, b) => b.returnDate.getDate() - a.returnDate.getDate());
+
+    return ret.at(0).returnDate.toLocaleDateString("en-US");
+  }
 </script>
 
 <div class="flex flex-row justify-between">
@@ -208,6 +234,11 @@
         <TableHeadCell>Available count</TableHeadCell>
         <TableHeadCell>Borrowed count</TableHeadCell>
       {/if}
+      {#if selectedSection !== "History"}
+        <TableHeadCell>Expires</TableHeadCell>
+      {:else}
+        <TableHeadCell>Return date</TableHeadCell>
+      {/if}
     </TableHead>
     <TableBody class="divide-y">
       {#each renderBooks as book}
@@ -217,7 +248,9 @@
           {onBorrowOrReturnBook}
           {onSaveEdit}
           {isBorrowed}
-          isHistory={ selectedSection === "History"}
+          isHistory={selectedSection === "History"}
+          {getBookExpirationDate}
+          {getBookReturnDate}
         />
       {/each}
     </TableBody>

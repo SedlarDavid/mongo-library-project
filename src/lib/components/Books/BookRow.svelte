@@ -16,6 +16,8 @@
   export let onBorrowOrReturnBook: (id: string, data: IBook) => void;
   export let onSaveEdit: (id: string, data: IBook) => void;
   export let isBorrowed: (book: Book) => boolean;
+  export let getBookExpirationDate: (book: Book) => string;
+  export let getBookReturnDate: (book: Book) => string;
   const bookFormData = writable<IBook>({
     _id: "",
     name: "",
@@ -113,6 +115,13 @@
         />
       {:else}
         {book.borrowedCount}
+      {/if}
+    </TableBodyCell>
+    <TableBodyCell>
+      {#if !isHistory}
+        {getBookExpirationDate(book)}
+      {:else}
+        {getBookReturnDate(book)}
       {/if}
     </TableBodyCell>
     <TableBodyCell>
