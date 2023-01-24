@@ -12,7 +12,7 @@
 
   export let book: Book;
   export let canEdit: boolean = false;
-  export let onBorrowBook: (book: Book) => void;
+  export let onBorrowBook: (id: string, data: IBook) => void;
   export let onSaveEdit: (id: string, data: IBook) => void;
   export let isBorrowed: (book: Book) => boolean;
   const bookFormData = writable<IBook>({
@@ -119,7 +119,7 @@
       outline={true}
       on:click={canEdit
         ? () => onSaveEdit(book._id, $bookFormData)
-        : () => onBorrowBook(book)}
+        : () => onBorrowBook(book._id, $bookFormData)}
       pill={true}>{canEdit ? "Save" : "Borrow"}</Button
     >
   </TableBodyCell>

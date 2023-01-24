@@ -20,7 +20,7 @@
   import * as Realm from "realm-web";
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
-  import type { Borrowing } from "../models/Borrowings/Borrowing";
+  import { Borrowing } from "../models/Borrowings/Borrowing";
   import BookRow from "../components/Books/BookRow.svelte";
   import type { Writable } from "svelte/store";
   import { notifications } from "../tools/notifications";
@@ -71,15 +71,29 @@
     user = result.find((u) => u.personalId === realmApp.currentUser.id);
   }
 
-  function onBorrowBook(book: Book): void {
-    if (book.availableCount === 0) {
+  function onBorrowBook(id: string, data: IBook): void {
+    if (renderBooks.find((b) => b._id === id).availableCount === 0) {
       notifications.warning("No books left to borrow!", 3000);
+    } else {
+      data.availableCount--;
+      data.borrowedCount++;
+      mongo
+        .db(Constants.DatabaseName)
+        .collection(MongoCollections.Books)
+        .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
+      //TODO via Trigger
+      mongo
+        .db(Constants.DatabaseName)
+        .collection(MongoCollections.Borrowings)
+        .insertOne(new Borrowing(id, user.personalId, new Date()));
     }
   }
   function isBorrowed(book: Book): boolean {
     return (
       borrowings.find(
-        (b) => b.bookId === book._id.toString() && b.userId === user.personalId
+        (b) =>
+          b.bookId.toString() === book._id.toString() &&
+          b.userId === user.personalId
       ) !== undefined
     );
   }
