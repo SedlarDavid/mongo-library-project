@@ -6,7 +6,7 @@
 
 #### Books catalog - @SedlarDavd
 - [x] Librarian - edit books data
-- [ ] Librarian - delete books
+- [x] Librarian - delete books
 - [ ] Librarian - add books
 - [x] User - borrow books
 - [x] User - borrow books
