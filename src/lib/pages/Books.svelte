@@ -71,7 +71,24 @@
     user = result.find((u) => u.personalId === realmApp.currentUser.id);
   }
 
-  function onBorrowBook(id: string, data: IBook): void {
+  function onBorrowOrReturnBook(id: string, data: IBook): void {
+    if (
+      isBorrowed(renderBooks.find((b) => b._id.toString() === id.toString()))
+    ) {
+      data.availableCount++;
+      data.borrowedCount--;
+      mongo
+        .db(Constants.DatabaseName)
+        .collection(MongoCollections.Books)
+        .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
+      //TODO via Trigger
+      mongo
+        .db(Constants.DatabaseName)
+        .collection(MongoCollections.Borrowings)
+        .deleteOne({ bookId: new ObjectId(id), userId: user.personalId });
+      return;
+    }
+
     if (renderBooks.find((b) => b._id === id).availableCount === 0) {
       notifications.warning("No books left to borrow!", 3000);
     } else {
@@ -192,7 +209,7 @@
         <BookRow
           {book}
           canEdit={user.role === AccountRole.Admin}
-          {onBorrowBook}
+          {onBorrowOrReturnBook}
           {onSaveEdit}
           {isBorrowed}
         />
