@@ -16,7 +16,10 @@ jobs:
           envkey_VITE_DATA_SOURCE_NAME: ${{ secrets.VITE_DATA_SOURCE_NAME }}
           file_name: .env.production
       - name: Build
-        run: npm ci && npm run build
+        run: |
+          echo ${{ secrets.VITE_ATLAS_CLIENT }} 
+          echo ${{ secrets.VITE_DATA_SOURCE_NAME }}
+          npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
