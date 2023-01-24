@@ -15,16 +15,17 @@
   } from "flowbite-svelte";
   import { onMount } from "svelte";
   import { Constants, MongoCollections } from "../../Constants";
-  import { realmApp } from "../../main";
-  import { Book, type IBook } from "../models/Books/Book";
+  import { mongo, realmApp } from "../../main";
   import * as Realm from "realm-web";
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
-  import { Borrowing } from "../models/Borrowings/Borrowing";
   import BookRow from "../components/Books/BookRow.svelte";
   import type { Writable } from "svelte/store";
   import { notifications } from "../tools/notifications";
   import Toast from "../components/Toast.svelte";
+  import { BooksRepository } from "../repositories/BooksRepository";
+  import type { Book, IBook } from "../models/Books/Book";
+  import type { Borrowing } from "../models/Borrowings/Borrowing";
 
   let isLoading = true;
   var user: UserData;
@@ -42,13 +43,9 @@
   var books = new Array<Book>();
   var renderBooks = new Array<Book>();
   var borrowings = new Array<Borrowing>();
-  const mongo = realmApp.currentUser.mongoClient(
-    import.meta.env.VITE_DATA_SOURCE_NAME
-  );
 
   async function getBooks() {
     const data = mongo
-      .db(Constants.DatabaseName)
       .collection(MongoCollections.Books);
     const result = (await data.find()) as Book[];
     books = result;
@@ -57,7 +54,6 @@
   }
   async function getBorrowings() {
     const data = mongo
-      .db(Constants.DatabaseName)
       .collection(MongoCollections.Borrowings);
     const result = (await data.find()) as Borrowing[];
     borrowings = result;
@@ -65,7 +61,6 @@
 
   async function getCurrentUser() {
     const data = mongo
-      .db(Constants.DatabaseName)
       .collection(MongoCollections.Users);
     const result = (await data.find()) as UserData[];
     user = result.find((u) => u.personalId === realmApp.currentUser.id);
@@ -75,34 +70,14 @@
     if (
       isBorrowed(renderBooks.find((b) => b._id.toString() === id.toString()))
     ) {
-      data.availableCount++;
-      data.borrowedCount--;
-      mongo
-        .db(Constants.DatabaseName)
-        .collection(MongoCollections.Books)
-        .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
-      //TODO via Trigger
-      mongo
-        .db(Constants.DatabaseName)
-        .collection(MongoCollections.Borrowings)
-        .deleteOne({ bookId: new ObjectId(id), userId: user.personalId });
+      BooksRepository.returnBook(id, data);
       return;
     }
 
     if (renderBooks.find((b) => b._id === id).availableCount === 0) {
       notifications.warning("No books left to borrow!", 3000);
     } else {
-      data.availableCount--;
-      data.borrowedCount++;
-      mongo
-        .db(Constants.DatabaseName)
-        .collection(MongoCollections.Books)
-        .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
-      //TODO via Trigger
-      mongo
-        .db(Constants.DatabaseName)
-        .collection(MongoCollections.Borrowings)
-        .insertOne(new Borrowing(id, user.personalId, new Date()));
+      BooksRepository.borrowBook(id, data);
     }
   }
   function isBorrowed(book: Book): boolean {
@@ -115,10 +90,7 @@
     );
   }
   function onSaveEdit(id: string, data: IBook): void {
-    mongo
-      .db(Constants.DatabaseName)
-      .collection(MongoCollections.Books)
-      .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
+    BooksRepository.saveBookChanges(id, data);
   }
 
   function onSearchChanged(e): void {
