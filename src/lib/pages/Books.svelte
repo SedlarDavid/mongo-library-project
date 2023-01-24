@@ -173,7 +173,7 @@
       (b) => b.bookId.toString() === book._id.toString()
     );
 
-    if(!bor) return "";
+    if (!bor) return "";
 
     let returnDate = addDays(bor.borrowDate, 6);
 
@@ -191,6 +191,14 @@
       .sort((a, b) => b.returnDate.getDate() - a.returnDate.getDate());
 
     return ret.at(0).returnDate.toLocaleDateString("en-US");
+  }
+
+  function onBookDelete(id: string) {
+    let index = books.findIndex((b) => b._id.toString() === id.toString());
+    if (index > -1) {
+      books.splice(index, 1);
+    }
+    BooksRepository.deleteBook(id);
   }
 </script>
 
@@ -251,6 +259,7 @@
           isHistory={selectedSection === "History"}
           {getBookExpirationDate}
           {getBookReturnDate}
+          {onBookDelete}
         />
       {/each}
     </TableBody>

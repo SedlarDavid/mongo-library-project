@@ -25,6 +25,13 @@ export class BooksRepository {
       .collection(MongoCollections.BorrowHistory)
       .insertOne(new Return(id, realmApp.currentUser.id, new Date()));
   }
+  static deleteBook(id: string): void {
+    mongo.collection(MongoCollections.Books).deleteOne({
+      _id: new ObjectId(id.toString()),
+    });
+
+    //TODO update borrowings / returns via trigger
+  }
 
   static borrowBook(id: string, data: IBook): void {
     data.availableCount--;
