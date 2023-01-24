@@ -17,8 +17,8 @@ jobs:
           file_name: .env.production
       - name: Build
         run: |
-          echo ${{ secrets.VITE_ATLAS_CLIENT }} 
-          echo ${{ secrets.VITE_DATA_SOURCE_NAME }}
+          echo "var 1 ${{ secrets.VITE_ATLAS_CLIENT }}"
+          echo "var 1 ${{ secrets.VITE_DATA_SOURCE_NAME }}"
           npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
