@@ -18,6 +18,7 @@
   export let isBorrowed: (book: Book) => boolean;
   export let getBookExpirationDate: (book: Book) => string;
   export let getBookReturnDate: (book: Book) => string;
+  export let onBookDelete: (id:string) => void;
   const bookFormData = writable<IBook>({
     _id: "",
     name: "",
@@ -134,6 +135,13 @@
         pill={true}
         >{canEdit ? "Save" : isBorrowed(book) ? "Return" : "Borrow"}</Button
       >
+      {#if canEdit}
+        <Button
+          color="red"
+          on:click={() => onBookDelete(book._id)}
+          pill={true}>Delete</Button
+        >
+      {/if}
     </TableBodyCell>
   {/if}
 </TableBodyRow>

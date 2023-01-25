@@ -13,7 +13,6 @@
     TableHead,
     TableHeadCell,
   } from "flowbite-svelte";
-
   import { onMount } from "svelte";
   import { Constants, MongoCollections } from "../../Constants";
   import { mongo, realmApp } from "../../main";
@@ -33,7 +32,6 @@
   let isLoading = true;
   var user: UserData;
   var selectedSection: String = "All";
-
   const {
     BSON: { ObjectId },
   } = Realm;
@@ -42,6 +40,7 @@
     await getCurrentUser();
     await getBorrowings();
     await getReturns();
+    await getBooks();
   });
 
   var books = new Array<Book>();
@@ -195,6 +194,12 @@
     return ret.at(0).returnDate.toLocaleDateString("en-US");
   }
 
+  function onBookDelete(id: string) {
+    let index = books.findIndex((b) => b._id.toString() === id.toString());
+    if (index > -1) {
+      books.splice(index, 1);
+    }
+    BooksRepository.deleteBook(id);}
   async function onAddBook(data: IBook): Promise<void> {
     isLoading = true;
     let newBook = new Book(
@@ -242,7 +247,6 @@
     on:change={(e) => onSearchChanged(e)}
   />
 </div>
-
 <div class="h-24" />
 {#if !isLoading}
   <Table>
@@ -273,6 +277,7 @@
           isHistory={selectedSection === "History"}
           {getBookExpirationDate}
           {getBookReturnDate}
+          {onBookDelete}
         />
       {/each}
       {#if user.role === AccountRole.Admin}
