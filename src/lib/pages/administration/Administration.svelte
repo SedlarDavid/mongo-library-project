@@ -63,7 +63,7 @@
             nickname: user.nickname,
             email: user.email,
             address: user.address,
-            AccountRole: user.role,
+            role: user.role,
           },
         }
       );
@@ -103,8 +103,6 @@
     );
     getUsers();
   }
-
-  let accountRoles = {};
 </script>
 
 <div class="flex flex-row justify-between">
