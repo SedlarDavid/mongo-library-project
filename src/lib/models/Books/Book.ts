@@ -11,7 +11,21 @@ export interface IBook {
   borrowedCount: number;
 }
 
+import { writable } from "svelte/store";
+
+export interface IBook {
+  _id: string;
+  name: string;
+  author: string;
+  pagesCount: number;
+  releaseYear: number;
+  img: string;
+  availableCount: number;
+  borrowedCount: number;
+}
+
 export class Book {
+  _id: string;
   _id: string;
   name: string;
   author: string;
@@ -23,6 +37,7 @@ export class Book {
 
   constructor(
     _id: string,
+    _id: string,
     name: string,
     author: string,
     pagesCount: number,
@@ -30,8 +45,10 @@ export class Book {
     img: string,
     availableCount: number,
     //TODO from sum ATLAS function
+    //TODO from sum ATLAS function
     borrowedCount: number
   ) {
+    this._id = _id;
     this._id = _id;
     this.name = name;
     this.author = author;

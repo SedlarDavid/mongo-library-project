@@ -13,8 +13,23 @@
     TableHead,
     TableHeadCell,
   } from "flowbite-svelte";
+  import {
+    Avatar,
+    Button,
+    ButtonGroup,
+    Input,
+    Label,
+    Spinner,
+    Table,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
+    TableHead,
+    TableHeadCell,
+  } from "flowbite-svelte";
   import { onMount } from "svelte";
   import { Constants, MongoCollections } from "../../Constants";
+  import { mongo, realmApp } from "../../main";
   import { mongo, realmApp } from "../../main";
   import * as Realm from "realm-web";
   import type { UserData } from "../models/UserData/UserData";
@@ -32,11 +47,16 @@
   let isLoading = true;
   var user: UserData;
   var selectedSection: String = "All";
+  var user: UserData;
+  var selectedSection: String = "All";
   const {
     BSON: { ObjectId },
   } = Realm;
 
   onMount(async () => {
+    await getCurrentUser();
+    await getBorrowings();
+    await getReturns();
     await getCurrentUser();
     await getBorrowings();
     await getReturns();
@@ -47,11 +67,16 @@
   var renderBooks = new Array<Book>();
   var borrowings = new Array<Borrow>();
   var returns = new Array<Return>();
+  var renderBooks = new Array<Book>();
+  var borrowings = new Array<Borrow>();
+  var returns = new Array<Return>();
 
   async function getBooks() {
     const data = mongo.collection(MongoCollections.Books);
+    const data = mongo.collection(MongoCollections.Books);
     const result = (await data.find()) as Book[];
     books = result;
+    renderBooks = books;
     renderBooks = books;
     isLoading = false;
   }
@@ -241,6 +266,30 @@
     on:change={(e) => onSearchChanged(e)}
   />
 </div>
+<div class="h-12" />
+<ButtonGroup>
+  <Button
+    color={selectedSection === "All" ? "blue" : "light"}
+    on:click={() => onSectionChanged("All")}>All</Button
+  >
+  <Button
+    color={selectedSection === "Borrowed" ? "blue" : "light"}
+    on:click={() => onSectionChanged("Borrowed")}>Borrowed</Button
+  >
+  <Button
+    color={selectedSection === "History" ? "blue" : "light"}
+    on:click={() => onSectionChanged("History")}>History</Button
+  >
+</ButtonGroup>
+<div>
+  <div class="h-12" />
+  <Input
+    type="text"
+    id="search"
+    placeholder="Search..."
+    on:change={(e) => onSearchChanged(e)}
+  />
+</div>
 <div class="h-24" />
 {#if !isLoading}
   <Table>
@@ -250,6 +299,15 @@
       <TableHeadCell>Pages count</TableHeadCell>
       <TableHeadCell>Release year</TableHeadCell>
       <TableHeadCell>Image</TableHeadCell>
+      {#if selectedSection !== "History"}
+        <TableHeadCell>Available count</TableHeadCell>
+        <TableHeadCell>Borrowed count</TableHeadCell>
+      {/if}
+      {#if selectedSection !== "History"}
+        <TableHeadCell>Expires</TableHeadCell>
+      {:else}
+        <TableHeadCell>Return date</TableHeadCell>
+      {/if}
       {#if selectedSection !== "History"}
         <TableHeadCell>Available count</TableHeadCell>
         <TableHeadCell>Borrowed count</TableHeadCell>
@@ -272,6 +330,17 @@
           {getBookExpirationDate}
           {getBookReturnDate}
         />
+      {#each renderBooks as book}
+        <BookRow
+          {book}
+          canEdit={user.role === AccountRole.Admin}
+          {onBorrowOrReturnBook}
+          {onSaveEdit}
+          {isBorrowed}
+          isHistory={selectedSection === "History"}
+          {getBookExpirationDate}
+          {getBookReturnDate}
+        />
       {/each}
       {#if user.role === AccountRole.Admin}
         <NewBookRow {onAddBook} />
@@ -281,5 +350,7 @@
 {:else}
   <Spinner />
 {/if}
+
+<Toast />
 
 <Toast />
