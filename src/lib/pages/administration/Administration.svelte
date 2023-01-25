@@ -10,7 +10,7 @@
     Select,
     Spinner,
   } from 'flowbite-svelte';
-  import { writable } from 'svelte/store';
+
   import * as Realm from 'realm-web';
   import { mongo, realmApp } from '../../../main';
   import { Constants, MongoCollections } from '../../../Constants';
@@ -26,7 +26,6 @@
   } from 'flowbite-svelte';
   import { AccountRole } from '../../enums/AccountRole';
   import { AccountState } from '../../enums/AccountState';
-  import { each } from 'svelte/internal';
 
   let isLoading = true;
   const {
@@ -104,6 +103,8 @@
     );
     getUsers();
   }
+
+  let accountRoles = {};
 </script>
 
 <div class="flex flex-row justify-between">
@@ -183,20 +184,17 @@
             /></TableBodyCell
           >
           <TableBodyCell>
-            <ul
-              class="w-26 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-600 divide-y divide-gray-200 dark:divide-gray-600"
-            >
-              <li class="w-full">
-                <Radio name="roles" bind:checked={user.role} class="p-3"
-                  >User</Radio
-                >
-              </li>
-              <li class="w-full">
-                <Radio name="roles" bind:checked={user.role} class="p-3"
-                  >Librarian</Radio
-                >
-              </li>
-            </ul>
+            <select bind:value={user.role}>
+              <option selected={user.role === 0} value={0}
+                >{AccountRole[0]}</option
+              >
+              <option selected={user.role === 1} value={1}
+                >{AccountRole[1]}</option
+              >
+              <option selected={user.role === 2} value={2}
+                >{AccountRole[2]}</option
+              >
+            </select>
           </TableBodyCell>
           <TableBodyCell>{AccountState[user.accountState]}</TableBodyCell>
           <TableBodyCell>
