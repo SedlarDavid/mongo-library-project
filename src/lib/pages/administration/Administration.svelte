@@ -47,14 +47,6 @@
     isLoading = false;
   }
 
-  async function exportToJSON() {
-    const users = mongo.collection(MongoCollections.Users);
-    var result = users.find();
-    const data = JSON.stringify(result);
-    const json = JSON.stringify(data);
-    await fsPromise.writeFile('~/config.json', json);
-  }
-
   async function download(fileName, contentType) {
     const users = mongo.collection(MongoCollections.Users);
     var result = await users.find();
