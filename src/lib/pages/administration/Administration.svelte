@@ -184,7 +184,7 @@
           >
           <TableBodyCell>
             <ul
-              class="items-center w-full rounded-lg border border-gray-200 sm:flex dark:bg-gray-800 dark:border-gray-600 divide-x divide-gray-200 dark:divide-gray-600"
+              class="w-26 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-600 divide-y divide-gray-200 dark:divide-gray-600"
             >
               <li class="w-full">
                 <Radio name="roles" bind:checked={user.role} class="p-3"
@@ -227,10 +227,9 @@
                 : 'Unban'}
             </Button>
           </TableBodyCell>
-          <TableBodyCell
-            ><Button on:on:click={() => onSaveUser(user)}>Save</Button
-            ></TableBodyCell
-          >
+          <TableBodyCell>
+            <Button on:click={() => onSaveUser(user)}>Save</Button>
+          </TableBodyCell>
         </TableBodyRow>
       {/each}
     </TableBody>
