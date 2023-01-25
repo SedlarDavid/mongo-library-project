@@ -20,6 +20,7 @@
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
   import BookRow from "../components/Books/BookRow.svelte";
+  import NewBookRow from "../components/Books/NewBookRow.svelte";
   import type { Writable } from "svelte/store";
   import { notifications } from "../tools/notifications";
   import Toast from "../components/Toast.svelte";
