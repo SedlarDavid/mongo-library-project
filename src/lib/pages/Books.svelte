@@ -13,6 +13,7 @@
     TableHead,
     TableHeadCell,
   } from "flowbite-svelte";
+
   import { onMount } from "svelte";
   import { Constants, MongoCollections } from "../../Constants";
   import { mongo, realmApp } from "../../main";
@@ -20,6 +21,7 @@
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
   import BookRow from "../components/Books/BookRow.svelte";
+  import NewBookRow from "../components/Books/NewBookRow.svelte";
   import type { Writable } from "svelte/store";
   import { notifications } from "../tools/notifications";
   import Toast from "../components/Toast.svelte";
@@ -31,6 +33,7 @@
   let isLoading = true;
   var user: UserData;
   var selectedSection: String = "All";
+
   const {
     BSON: { ObjectId },
   } = Realm;
@@ -39,7 +42,6 @@
     await getCurrentUser();
     await getBorrowings();
     await getReturns();
-    await getBooks();
   });
 
   var books = new Array<Book>();
@@ -173,7 +175,7 @@
       (b) => b.bookId.toString() === book._id.toString()
     );
 
-    if(!bor) return "";
+    if (!bor) return "";
 
     let returnDate = addDays(bor.borrowDate, 6);
 
@@ -191,6 +193,25 @@
       .sort((a, b) => b.returnDate.getDate() - a.returnDate.getDate());
 
     return ret.at(0).returnDate.toLocaleDateString("en-US");
+  }
+
+  async function onAddBook(data: IBook): Promise<void> {
+    isLoading = true;
+    let newBook = new Book(
+      data._id,
+      data.name,
+      data.author,
+      data.pagesCount,
+      data.releaseYear,
+      data.img,
+      data.availableCount,
+      data.borrowedCount
+    );
+    let id = await BooksRepository.addBook(newBook);
+    newBook._id = id.toString();
+    books.push(newBook);
+    isLoading = false;
+    updateBooks();
   }
 </script>
 
@@ -221,6 +242,7 @@
     on:change={(e) => onSearchChanged(e)}
   />
 </div>
+
 <div class="h-24" />
 {#if !isLoading}
   <Table>
@@ -253,6 +275,9 @@
           {getBookReturnDate}
         />
       {/each}
+      {#if user.role === AccountRole.Admin}
+        <NewBookRow {onAddBook} />
+      {/if}
     </TableBody>
   </Table>
 {:else}

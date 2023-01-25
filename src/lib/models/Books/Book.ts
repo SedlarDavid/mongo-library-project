@@ -54,4 +54,16 @@ export class Book {
       formData.borrowedCount
     );
   }
+
+  withRemovedId() {
+    return {
+      name: this.name,
+      author: this.author,
+      pagesCount: this.pagesCount,
+      releaseYear: this.releaseYear,
+      img: this.img,
+      availableCount: this.availableCount,
+      borrowedCount: this.borrowedCount,
+    };
+  }
 }

@@ -43,4 +43,9 @@ export class BooksRepository {
       .collection(MongoCollections.Books)
       .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
   }
+
+  static async addBook(book: Book): Promise<number> {
+    var result = await mongo.collection(MongoCollections.Books).insertOne(book.withRemovedId());
+    return result.insertedId;
+  }
 }
