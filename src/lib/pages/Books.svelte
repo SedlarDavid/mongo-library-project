@@ -198,7 +198,24 @@
     if (index > -1) {
       books.splice(index, 1);
     }
-    BooksRepository.deleteBook(id);
+    BooksRepository.deleteBook(id);}
+  async function onAddBook(data: IBook): Promise<void> {
+    isLoading = true;
+    let newBook = new Book(
+      data._id,
+      data.name,
+      data.author,
+      data.pagesCount,
+      data.releaseYear,
+      data.img,
+      data.availableCount,
+      data.borrowedCount
+    );
+    let id = await BooksRepository.addBook(newBook);
+    newBook._id = id.toString();
+    books.push(newBook);
+    isLoading = false;
+    updateBooks();
   }
 </script>
 
@@ -262,6 +279,9 @@
           {onBookDelete}
         />
       {/each}
+      {#if user.role === AccountRole.Admin}
+        <NewBookRow {onAddBook} />
+      {/if}
     </TableBody>
   </Table>
 {:else}

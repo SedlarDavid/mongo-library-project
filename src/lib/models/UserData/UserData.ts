@@ -6,6 +6,7 @@ interface IRegisterUserFormData {
   name: string;
   surname: string;
   personalId: string;
+  nationalIdNumber: string;
   address: string;
   email: string;
   password: string;
@@ -16,6 +17,7 @@ export const registerUserFormData = writable({
   name: "",
   surname: "",
   personalId: "",
+  nationalIdNumber: "",
   address: "",
   email: "",
   password: "",
@@ -26,6 +28,7 @@ export class UserData {
   name: string;
   surname: string;
   personalId: string;
+  nationalIdNumber: string;
   address: string;
   email: string;
   nickname: string;
@@ -37,6 +40,7 @@ export class UserData {
     name: string,
     surname: string,
     personalId: string,
+    nationalIdNumber: string,
     address: string,
     email: string,
     nickname: string,
@@ -47,6 +51,7 @@ export class UserData {
     this.name = name;
     this.surname = surname;
     this.personalId = personalId;
+    this.nationalIdNumber = nationalIdNumber;
     this.address = address;
     this.email = email;
     this.nickname = nickname;
@@ -60,6 +65,7 @@ export class UserData {
       formData.name,
       formData.surname,
       formData.personalId,
+      formData.nationalIdNumber,
       formData.address,
       formData.email,
       formData.email.split("@")[0],
