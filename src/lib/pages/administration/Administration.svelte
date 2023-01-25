@@ -11,7 +11,7 @@
   } from "flowbite-svelte";
   import { writable } from "svelte/store";
   import * as Realm from "realm-web";
-  import { realmApp } from "../../../main";
+  import { mongo, realmApp } from "../../../main";
   import { Constants, MongoCollections } from "../../../Constants";
   import { onMount } from "svelte";
   import type { UserData } from "../../models/UserData/UserData";
@@ -39,11 +39,7 @@
   var users = new Array<UserData>();
 
   async function getUsers() {
-    const mongo = realmApp.currentUser.mongoClient(
-      import.meta.env.VITE_DATA_SOURCE_NAME
-    );
     const data = mongo
-      .db(Constants.DatabaseName)
       .collection(MongoCollections.Users);
     const result = (await data.find()) as UserData[];
     console.log(result[0].name);

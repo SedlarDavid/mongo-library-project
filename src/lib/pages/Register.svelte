@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Button, Input, Label, Spinner } from "flowbite-svelte";
+  import { Button, Input, Label, Spinner } from 'flowbite-svelte';
 
-  import * as Realm from "realm-web";
-  import { realmApp } from "../../main";
-  import { Constants, MongoCollections } from "../../Constants";
-  import { UserData, registerUserFormData } from "../models/UserData/UserData";
+  import * as Realm from 'realm-web';
+  import { realmApp } from '../../main';
+  import { Constants, MongoCollections } from '../../Constants';
+  import { UserData, registerUserFormData } from '../models/UserData/UserData';
 
   const {
     BSON: { ObjectId },
@@ -28,10 +28,10 @@
         password,
       });
       await loginEmailPassword(email, password);
-      console.log("Successfully logged in!");
+      console.log('Successfully logged in!');
       createUserData();
     } catch (err) {
-      console.error("Failed to log in", err);
+      console.error('Failed to log in', err);
     }
   }
 
@@ -44,9 +44,10 @@
       const user = await realmApp.logIn(credentials);
       // `App.currentUser` updates to match the logged in user
       console.assert(user.id === realmApp.currentUser.id);
+      $registerUserFormData.personalId = user.id;
       return user;
     } catch (err) {
-      console.error("Failed to log in", err);
+      console.error('Failed to log in', err);
     }
   }
 
@@ -74,7 +75,7 @@
         <Input
           type="text"
           id="name"
-          placeholder="John"
+          placeholder="Name"
           required
           bind:value={$registerUserFormData.name}
         />
@@ -90,13 +91,15 @@
         />
       </div>
       <div>
-        <Label for="personalId" class="mb-2 text-white">Personal ID</Label>
+        <Label for="nationalIdNumber" class="mb-2 text-white"
+          >National ID Number</Label
+        >
         <Input
           type="text"
-          id="personalId"
+          id="nationalIdNumber"
           placeholder="981205/5578"
           required
-          bind:value={$registerUserFormData.personalId}
+          bind:value={$registerUserFormData.nationalIdNumber}
         />
       </div>
       <div>
