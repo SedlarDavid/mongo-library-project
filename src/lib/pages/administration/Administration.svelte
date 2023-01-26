@@ -90,6 +90,8 @@
   }
 
   async function OnReset() {
+    /*var allUsers = realmApp.allUsers;
+    console.log(allUsers);*/
     await getUsers();
     isLoading = false;
   }
