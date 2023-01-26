@@ -239,13 +239,22 @@
     URL.revokeObjectURL(a.href);
   }
 
-  let importFile;
-  $: if (importFile) {
-    // https://developer.mozilla.org/en-US/docs/Web/API/FileList
-    console.log(importFile);
-    for (const file of importFile) {
-      ImportRepository.importData(file);
-    }
+  var jsonData;
+  function handleFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const contents = event.target.result;
+      // do something with the contents
+      console.log(contents);
+      jsonData = JSON.parse(contents as string);
+
+      (jsonData as Array<object>).forEach((obj) =>
+        BooksRepository.importBookData(obj)
+      );
+    };
+    reader.readAsText(file);
   }
 </script>
 
@@ -255,13 +264,7 @@
     <Button on:click={exportBooks}>Export books data</Button>
     <br />
     <Label for="import">Upload file to import:</Label>
-    <Fileupload
-      accept="application/json"
-      bind:value={importFile}
-      id="import"
-      name="import"
-      type="file"
-    />
+    <input type="file" on:change={handleFile} />
   </div>
 </div>
 <div class="h-12" />

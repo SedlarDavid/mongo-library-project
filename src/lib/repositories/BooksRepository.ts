@@ -10,12 +10,17 @@ const {
 } = Realm;
 
 export class BooksRepository {
-
+  static importBookData(bookData: object) {
+    let mongo = realmApp.currentUser
+      .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+      .db(Constants.DatabaseName);
+    mongo.collection(MongoCollections.Books).insertOne(bookData);
+  }
 
   static returnBook(id: string, data: IBook): void {
-   let mongo = realmApp.currentUser
-    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
-    .db(Constants.DatabaseName);
+    let mongo = realmApp.currentUser
+      .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+      .db(Constants.DatabaseName);
     data.availableCount++;
     data.borrowedCount--;
     mongo
@@ -32,8 +37,8 @@ export class BooksRepository {
   }
   static deleteBook(id: string): void {
     let mongo = realmApp.currentUser
-    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
-    .db(Constants.DatabaseName);
+      .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+      .db(Constants.DatabaseName);
     mongo.collection(MongoCollections.Books).deleteOne({
       _id: new ObjectId(id.toString()),
     });
@@ -43,8 +48,8 @@ export class BooksRepository {
 
   static borrowBook(id: string, data: IBook): void {
     let mongo = realmApp.currentUser
-    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
-    .db(Constants.DatabaseName);
+      .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+      .db(Constants.DatabaseName);
     data.availableCount--;
     data.borrowedCount++;
     mongo
@@ -58,8 +63,8 @@ export class BooksRepository {
 
   static saveBookChanges(id: string, data: IBook): void {
     let mongo = realmApp.currentUser
-    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
-    .db(Constants.DatabaseName);
+      .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+      .db(Constants.DatabaseName);
     mongo
       .collection(MongoCollections.Books)
       .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
@@ -67,8 +72,8 @@ export class BooksRepository {
 
   static async addBook(book: Book): Promise<number> {
     let mongo = realmApp.currentUser
-    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
-    .db(Constants.DatabaseName);
+      .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+      .db(Constants.DatabaseName);
     var result = await mongo
       .collection(MongoCollections.Books)
       .insertOne(book.withRemovedId());
