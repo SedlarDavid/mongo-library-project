@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { Button, Input, Label, Spinner } from 'flowbite-svelte';
+  import { Button, Input, Label, Spinner } from "flowbite-svelte";
 
-  import * as Realm from 'realm-web';
-  import {  realmApp } from '../../../main';
-  import { Constants, MongoCollections } from '../../../Constants';
-  import { onMount } from 'svelte';
-  import type { UserData } from '../../models/UserData/UserData';
+  import * as Realm from "realm-web";
+  import { realmApp } from "../../../main";
+  import { Constants, MongoCollections } from "../../../Constants";
+  import { onMount } from "svelte";
+  import type { UserData } from "../../models/UserData/UserData";
   import {
     Table,
     TableBody,
@@ -13,13 +13,13 @@
     TableBodyRow,
     TableHead,
     TableHeadCell,
-  } from 'flowbite-svelte';
-  import { AccountRole } from '../../enums/AccountRole';
-  import { AccountState } from '../../enums/AccountState';
+  } from "flowbite-svelte";
+  import { AccountRole } from "../../enums/AccountRole";
+  import { AccountState } from "../../enums/AccountState";
 
   const mongo = realmApp.currentUser
-  .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
-  .db(Constants.DatabaseName);
+    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+    .db(Constants.DatabaseName);
 
   let isLoading = true;
   const {
@@ -45,10 +45,10 @@
     var result = await users.find();
     const data = JSON.stringify(result);
 
-    var a = document.createElement('a');
-    var file = new Blob([data], { type: 'text/plain' });
+    var a = document.createElement("a");
+    var file = new Blob([data], { type: "text/plain" });
     a.href = URL.createObjectURL(file);
-    a.download = 'json.txt';
+    a.download = "json.txt";
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -128,10 +128,36 @@
   async function onSubmit(_e) {
     isLoading = true;
   }
+
+  var jsonData;
+  function handleFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const contents = event.target.result;
+      // do something with the contents
+      console.log(contents);
+      jsonData = JSON.parse(contents as string);
+
+      (jsonData as Array<object>).forEach((obj) =>
+        mongo.collection(MongoCollections.Users).insertOne(obj)
+      );
+    };
+    reader.readAsText(file);
+  }
 </script>
 
+<div class="flex flex-row justify-between">
+  <h1 class="text-black">Administration</h1>
+  <div>
+    <Label for="import">Upload file to import:</Label>
+    <input type="file" on:change={handleFile} />
+  </div>
+</div>
+<div class="h-12" />
 <Button on:click={() => (isFormOpen = !isFormOpen)}>
-  {isFormOpen ? 'Close' : 'Open'} form to create new user
+  {isFormOpen ? "Close" : "Open"} form to create new user
 </Button>
 
 <form
@@ -292,8 +318,8 @@
           <TableBodyCell>
             <Button on:click={() => onChangeBanStateOfUser(user)}>
               {user.accountState === 0 || user.accountState === 1
-                ? 'Ban'
-                : 'Unban'}
+                ? "Ban"
+                : "Unban"}
             </Button>
           </TableBodyCell>
           <TableBodyCell>
