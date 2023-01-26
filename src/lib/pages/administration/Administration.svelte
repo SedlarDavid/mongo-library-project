@@ -1,17 +1,10 @@
 <script lang="ts">
-  import {
-    Button,
-    Input,
-    Label,
-    Radio,
-    Select,
-    Spinner,
-  } from 'flowbite-svelte';
+  import { Button, Input, Label, Spinner } from 'flowbite-svelte';
 
   import * as Realm from 'realm-web';
   import { mongo, realmApp } from '../../../main';
   import { Constants, MongoCollections } from '../../../Constants';
-  import { getAllContexts, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import type { UserData } from '../../models/UserData/UserData';
   import {
     Table,
@@ -47,7 +40,6 @@
     const users = mongo.collection(MongoCollections.Users);
     var result = await users.find();
     const data = JSON.stringify(result);
-    console.log(data);
 
     var a = document.createElement('a');
     var file = new Blob([data], { type: 'text/plain' });
