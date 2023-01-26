@@ -3,6 +3,7 @@
     Avatar,
     Button,
     ButtonGroup,
+    Fileupload,
     Input,
     Label,
     Spinner,
@@ -15,7 +16,7 @@
   } from "flowbite-svelte";
   import { onMount } from "svelte";
   import { Constants, MongoCollections } from "../../Constants";
-  import {  realmApp } from "../../main";
+  import { realmApp } from "../../main";
   import * as Realm from "realm-web";
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
@@ -28,10 +29,11 @@
   import { Book, type IBook } from "../models/Books/Book";
   import type { Borrow } from "../models/Borrowings/Borrow";
   import type { Return } from "../models/Borrowings/Return";
+  import { ImportRepository } from "../repositories/ImportRepository";
 
-   const mongo = realmApp.currentUser
-  .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
-  .db(Constants.DatabaseName);
+  const mongo = realmApp.currentUser
+    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+    .db(Constants.DatabaseName);
 
   let isLoading = true;
   var user: UserData;
@@ -203,7 +205,8 @@
     if (index > -1) {
       books.splice(index, 1);
     }
-    BooksRepository.deleteBook(id);}
+    BooksRepository.deleteBook(id);
+  }
   async function onAddBook(data: IBook): Promise<void> {
     isLoading = true;
     let newBook = new Book(
@@ -223,24 +226,43 @@
     updateBooks();
   }
 
-  
   async function exportBooks() {
     const books = mongo.collection(MongoCollections.Books);
     var result = await books.find();
     const data = JSON.stringify(result);
 
-    var a = document.createElement('a');
+    var a = document.createElement("a");
     var file = new Blob([data], { type: "application/json" });
     a.href = URL.createObjectURL(file);
-    a.download = 'books.json';
+    a.download = "books.json";
     a.click();
     URL.revokeObjectURL(a.href);
+  }
+
+  let importFile;
+  $: if (importFile) {
+    // https://developer.mozilla.org/en-US/docs/Web/API/FileList
+    console.log(importFile);
+    for (const file of importFile) {
+      ImportRepository.importData(file);
+    }
   }
 </script>
 
 <div class="flex flex-row justify-between">
   <h1 class="text-black">Books</h1>
-  <Button on:click={exportBooks}>Export books data</Button>
+  <div>
+    <Button on:click={exportBooks}>Export books data</Button>
+    <br />
+    <Label for="import">Upload file to import:</Label>
+    <Fileupload
+      accept="application/json"
+      bind:value={importFile}
+      id="import"
+      name="import"
+      type="file"
+    />
+  </div>
 </div>
 <div class="h-12" />
 <ButtonGroup>
