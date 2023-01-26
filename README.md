@@ -29,3 +29,18 @@
 #### Authentication
 - [x] Login - @SadilekJ
 - [x] Registration - @SedlarDavid
+
+
+### TODO
+DJW 
+- [ ] import
+- [ ] rozrazeni knih userum
+- [ ] check na jen user vypujcky
+- [ ] cant borrow if innnactive
+- [ ] search na books
+
+HNS
+- [ ] search - 3 chars
+- [ ] autorizace a visibilita menu
+- [ ] create user - API endpoints, idk...
+- [ ] cant edit user data if innactive
