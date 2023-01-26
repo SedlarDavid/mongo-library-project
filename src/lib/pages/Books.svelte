@@ -15,7 +15,7 @@
   } from "flowbite-svelte";
   import { onMount } from "svelte";
   import { Constants, MongoCollections } from "../../Constants";
-  import { mongo, realmApp } from "../../main";
+  import {  realmApp } from "../../main";
   import * as Realm from "realm-web";
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
@@ -28,6 +28,10 @@
   import { Book, type IBook } from "../models/Books/Book";
   import type { Borrow } from "../models/Borrowings/Borrow";
   import type { Return } from "../models/Borrowings/Return";
+
+   const mongo = realmApp.currentUser
+  .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+  .db(Constants.DatabaseName);
 
   let isLoading = true;
   var user: UserData;
@@ -218,10 +222,25 @@
     isLoading = false;
     updateBooks();
   }
+
+  
+  async function exportBooks() {
+    const books = mongo.collection(MongoCollections.Books);
+    var result = await books.find();
+    const data = JSON.stringify(result);
+
+    var a = document.createElement('a');
+    var file = new Blob([data], { type: "application/json" });
+    a.href = URL.createObjectURL(file);
+    a.download = 'books.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
 </script>
 
 <div class="flex flex-row justify-between">
   <h1 class="text-black">Books</h1>
+  <Button on:click={exportBooks}>Export books data</Button>
 </div>
 <div class="h-12" />
 <ButtonGroup>

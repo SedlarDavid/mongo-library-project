@@ -1,6 +1,6 @@
 import * as Realm from "realm-web";
 import { Constants, MongoCollections } from "../../Constants";
-import { mongo, realmApp } from "../../main";
+import { realmApp } from "../../main";
 import { Book, type IBook } from "../models/Books/Book";
 import { Borrow } from "../models/Borrowings/Borrow";
 import { Return } from "../models/Borrowings/Return";
@@ -10,7 +10,12 @@ const {
 } = Realm;
 
 export class BooksRepository {
+
+
   static returnBook(id: string, data: IBook): void {
+   let mongo = realmApp.currentUser
+    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+    .db(Constants.DatabaseName);
     data.availableCount++;
     data.borrowedCount--;
     mongo
@@ -26,6 +31,9 @@ export class BooksRepository {
       .insertOne(new Return(id, realmApp.currentUser.id, new Date()));
   }
   static deleteBook(id: string): void {
+    let mongo = realmApp.currentUser
+    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+    .db(Constants.DatabaseName);
     mongo.collection(MongoCollections.Books).deleteOne({
       _id: new ObjectId(id.toString()),
     });
@@ -34,6 +42,9 @@ export class BooksRepository {
   }
 
   static borrowBook(id: string, data: IBook): void {
+    let mongo = realmApp.currentUser
+    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+    .db(Constants.DatabaseName);
     data.availableCount--;
     data.borrowedCount++;
     mongo
@@ -46,13 +57,21 @@ export class BooksRepository {
   }
 
   static saveBookChanges(id: string, data: IBook): void {
+    let mongo = realmApp.currentUser
+    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+    .db(Constants.DatabaseName);
     mongo
       .collection(MongoCollections.Books)
       .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
   }
 
   static async addBook(book: Book): Promise<number> {
-    var result = await mongo.collection(MongoCollections.Books).insertOne(book.withRemovedId());
+    let mongo = realmApp.currentUser
+    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+    .db(Constants.DatabaseName);
+    var result = await mongo
+      .collection(MongoCollections.Books)
+      .insertOne(book.withRemovedId());
     return result.insertedId;
   }
 }

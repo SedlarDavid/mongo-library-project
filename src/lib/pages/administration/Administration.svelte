@@ -2,7 +2,7 @@
   import { Button, Input, Label, Spinner } from 'flowbite-svelte';
 
   import * as Realm from 'realm-web';
-  import { mongo, realmApp } from '../../../main';
+  import {  realmApp } from '../../../main';
   import { Constants, MongoCollections } from '../../../Constants';
   import { onMount } from 'svelte';
   import type { UserData } from '../../models/UserData/UserData';
@@ -16,6 +16,10 @@
   } from 'flowbite-svelte';
   import { AccountRole } from '../../enums/AccountRole';
   import { AccountState } from '../../enums/AccountState';
+
+  const mongo = realmApp.currentUser
+  .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+  .db(Constants.DatabaseName);
 
   let isLoading = true;
   const {
