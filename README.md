@@ -37,7 +37,7 @@ DJW
 - [ ] rozrazeni knih userum
 - [ ] check na jen user vypujcky
 - [ ] cant borrow if innnactive
-- [ ] search na books
+- [x] search na books
 
 HNS
 - [ ] search - 3 chars
