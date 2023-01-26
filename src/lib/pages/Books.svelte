@@ -28,6 +28,7 @@
   import { Book, type IBook } from "../models/Books/Book";
   import type { Borrow } from "../models/Borrowings/Borrow";
   import type { Return } from "../models/Borrowings/Return";
+  import { AccountState } from "../enums/AccountState";
 
   const mongo = realmApp.currentUser
     .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
@@ -78,6 +79,15 @@
   }
 
   function onBorrowOrReturnBook(id: string, data: IBook): void {
+    if (user.accountState === AccountState.Inactive) {
+      notifications.danger(
+        "Innactive users cannot borrow books, please refer to your librarian!",
+        3000
+      );
+
+      return;
+    }
+
     if (
       borrowings.filter((b) => b.userId === realmApp.currentUser.id.toString())
         .length === 6
@@ -156,25 +166,25 @@
       $search.name.length < 3 ||
       $search.author.length < 3 ||
       $search.releaseYear.toString().length < 3
-    ){
+    ) {
       notifications.info(
         "Search parameters must have at least three characters",
         3000
       );
       return;
     }
-      const searchQuery = {
-        $or: [
-          { author: { $regex: `.*${$search.author}.*`, $options: "i" } },
-          { name: { $regex: `.*${$search.name}.*`, $options: "i" } },
-          {
-            releaseYear: {
-              $regex: `.*${$search.releaseYear}.*`,
-              $options: "i",
-            },
+    const searchQuery = {
+      $or: [
+        { author: { $regex: `.*${$search.author}.*`, $options: "i" } },
+        { name: { $regex: `.*${$search.name}.*`, $options: "i" } },
+        {
+          releaseYear: {
+            $regex: `.*${$search.releaseYear}.*`,
+            $options: "i",
           },
-        ],
-      };
+        },
+      ],
+    };
 
     const data = mongo.collection(MongoCollections.Books);
     const result = (await data.find(searchQuery)) as Book[];
