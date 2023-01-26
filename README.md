@@ -36,7 +36,7 @@ DJW
 - [ ] import
 - [ ] rozrazeni knih userum
 - [ ] check na jen user vypujcky
-- [ ] cant borrow if innnactive
+- [x] cant borrow if innnactive
 - [x] search na books
 
 HNS
