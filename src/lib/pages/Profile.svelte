@@ -1,15 +1,5 @@
 <script lang="ts">
-  import {
-    Button,
-    ButtonGroup,
-    Dropdown,
-    DropdownItem,
-    Input,
-    Label,
-    Select,
-    Spinner,
-  } from 'flowbite-svelte';
-  import { writable } from 'svelte/store';
+  import { Button, ButtonGroup, Input, Spinner } from 'flowbite-svelte';
   import * as Realm from 'realm-web';
   import { realmApp } from '../../main';
   import { Constants, MongoCollections } from '../../Constants';
@@ -23,9 +13,7 @@
     TableHead,
     TableHeadCell,
   } from 'flowbite-svelte';
-  import { AccountRole } from '../enums/AccountRole';
   import { AccountState } from '../enums/AccountState';
-  import { each } from 'svelte/internal';
 
   let isLoading = true;
   const {
@@ -51,12 +39,12 @@
     isLoading = false;
   }
 
-  function onSaveAll(e: MouseEvent): void {
+  async function onSaveAll(e: MouseEvent) {
     const mongo = realmApp.currentUser.mongoClient(
       import.meta.env.VITE_DATA_SOURCE_NAME
     );
 
-    const data = mongo
+    const data = await mongo
       .db(Constants.DatabaseName)
       .collection(MongoCollections.Users)
       .updateOne(
@@ -73,6 +61,7 @@
           },
         }
       );
+    await getUser();
   }
 </script>
 
