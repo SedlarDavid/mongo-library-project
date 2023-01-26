@@ -372,7 +372,7 @@
           {onBookDelete}
         />
       {/each}
-      {#if user.role === AccountRole.Admin}
+      {#if user.role === AccountRole.Admin && selectedSection === "All"}
         <NewBookRow {onAddBook} />
       {/if}
     </TableBody>
