@@ -15,7 +15,7 @@
   } from "flowbite-svelte";
   import { onMount } from "svelte";
   import { Constants, MongoCollections } from "../../Constants";
-  import {  realmApp } from "../../main";
+  import { realmApp } from "../../main";
   import * as Realm from "realm-web";
   import type { UserData } from "../models/UserData/UserData";
   import { AccountRole } from "../enums/AccountRole";
@@ -29,9 +29,9 @@
   import type { Borrow } from "../models/Borrowings/Borrow";
   import type { Return } from "../models/Borrowings/Return";
 
-   const mongo = realmApp.currentUser
-  .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
-  .db(Constants.DatabaseName);
+  const mongo = realmApp.currentUser
+    .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+    .db(Constants.DatabaseName);
 
   let isLoading = true;
   var user: UserData;
@@ -78,6 +78,18 @@
   }
 
   function onBorrowOrReturnBook(id: string, data: IBook): void {
+    if (
+      borrowings.filter((b) => b.userId === realmApp.currentUser.id.toString())
+        .length === 6
+    ) {
+      notifications.warning(
+        "You can't borrow more than six book, return some first!",
+        3000
+      );
+
+      return;
+    }
+
     if (
       isBorrowed(renderBooks.find((b) => b._id.toString() === id.toString()))
     ) {
@@ -203,7 +215,8 @@
     if (index > -1) {
       books.splice(index, 1);
     }
-    BooksRepository.deleteBook(id);}
+    BooksRepository.deleteBook(id);
+  }
   async function onAddBook(data: IBook): Promise<void> {
     isLoading = true;
     let newBook = new Book(
@@ -223,16 +236,15 @@
     updateBooks();
   }
 
-  
   async function exportBooks() {
     const books = mongo.collection(MongoCollections.Books);
     var result = await books.find();
     const data = JSON.stringify(result);
 
-    var a = document.createElement('a');
+    var a = document.createElement("a");
     var file = new Blob([data], { type: "application/json" });
     a.href = URL.createObjectURL(file);
-    a.download = 'books.json';
+    a.download = "books.json";
     a.click();
     URL.revokeObjectURL(a.href);
   }
