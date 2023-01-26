@@ -5,7 +5,7 @@
   import { mongo, realmApp } from '../../../main';
   import { Constants, MongoCollections } from '../../../Constants';
   import { onMount } from 'svelte';
-  import type { UserData } from '../../models/UserData/UserData';
+  import { UserData } from '../../models/UserData/UserData';
   import {
     Table,
     TableBody,
@@ -27,13 +27,54 @@
   });
 
   var users = new Array<UserData>();
+  var searchedUser = new UserData(
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    0,
+    [],
+    1
+  );
   let isFormOpen = false;
+
+  async function getSearchedUsers(user: UserData) {
+    const searchQuery = {
+      $or: [
+        { name: { $regex: `.*${user.name}.*`, $options: 'i' } },
+        { surname: { $regex: `.*${user.surname}.*`, $options: 'i' } },
+        { address: { $regex: `.*${user.address}.*`, $options: 'i' } },
+        {
+          nationalIdNumber: {
+            $regex: `.*${user.nationalIdNumber}.*`,
+            $options: 'i',
+          },
+        },
+      ],
+    };
+
+    const data = mongo.collection(MongoCollections.Users);
+    const result = (await data.find(searchQuery)) as UserData[];
+    users = result;
+  }
 
   async function getUsers() {
     const data = mongo.collection(MongoCollections.Users);
     const result = (await data.find()) as UserData[];
     users = result;
     isLoading = false;
+  }
+
+  async function OnUsersSearch() {
+    console.log(searchedUser);
+    getSearchedUsers(searchedUser);
+  }
+
+  async function OnReset() {
+    await getUsers();
   }
 
   async function download() {
@@ -44,7 +85,7 @@
     var a = document.createElement('a');
     var file = new Blob([data], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
-    a.download = 'json.txt';
+    a.download = 'users.txt';
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -65,26 +106,24 @@
             surname: user.surname,
             nationalIdNumber: user.nationalIdNumber,
             nickname: user.nickname,
-            email: user.email,
             address: user.address,
             role: user.role,
           },
         }
       );
-    getUsers();
+    await getUsers();
   }
 
   async function onDeleteUser(user: UserData) {
     const mongo = realmApp.currentUser.mongoClient(
       import.meta.env.VITE_DATA_SOURCE_NAME
     );
-    realmApp.currentUser.customData;
 
     const data = await mongo
       .db(Constants.DatabaseName)
       .collection(MongoCollections.Users)
       .deleteOne({ personalId: user.personalId });
-    getUsers();
+    await getUsers();
   }
 
   async function onChangeActivityStateOfUser(user: UserData) {
@@ -101,7 +140,7 @@
         },
       }
     );
-    getUsers();
+    await getUsers();
   }
 
   async function onChangeBanStateOfUser(user: UserData) {
@@ -118,7 +157,7 @@
         },
       }
     );
-    getUsers();
+    await getUsers();
   }
 
   async function onSubmit(_e) {
@@ -177,6 +216,35 @@
   <h1 class="text-black">Users</h1>
 </div>
 <div class="h-18" />
+<div>
+  <div class="flex flex-row justify-between" />
+  <Input
+    bind:value={searchedUser.name}
+    type="text"
+    id="name"
+    placeholder="John..."
+  />
+  <Input
+    bind:value={searchedUser.surname}
+    type="text"
+    id="surname"
+    placeholder="Wick..."
+  />
+  <Input
+    bind:value={searchedUser.address}
+    type="text"
+    id="address"
+    placeholder="Nad Stráněmi 553..."
+  />
+  <Input
+    bind:value={searchedUser.nationalIdNumber}
+    type="text"
+    id="nationalIdNumber"
+    placeholder="115115115/7415"
+  />
+  <Button on:click={() => OnUsersSearch()}>Search</Button>
+  <Button on:click={() => OnReset()}>Reset</Button>
+</div>
 {#if !isLoading}
   <Table>
     <TableHead>
@@ -184,7 +252,6 @@
       <TableHeadCell>Surname</TableHeadCell>
       <TableHeadCell>National ID Number</TableHeadCell>
       <TableHeadCell>Nickname</TableHeadCell>
-      <TableHeadCell>Email</TableHeadCell>
       <TableHeadCell>Address</TableHeadCell>
       <TableHeadCell>Role</TableHeadCell>
       <TableHeadCell>Account state</TableHeadCell>
@@ -230,15 +297,6 @@
               placeholder="JaBo"
               required
               bind:value={user.nickname}
-            /></TableBodyCell
-          >
-          <TableBodyCell>
-            <Input
-              type="text"
-              id="email"
-              placeholder="jason.bourne@oblivion.com"
-              required
-              bind:value={user.email}
             /></TableBodyCell
           >
           <TableBodyCell>

@@ -55,7 +55,6 @@
             surname: user.surname,
             nationalIdNumber: user.nationalIdNumber,
             nickname: user.nickname,
-            email: user.email,
             address: user.address,
             accountState: 1,
           },
@@ -79,7 +78,6 @@
       <TableHeadCell>Surname</TableHeadCell>
       <TableHeadCell>National ID Number</TableHeadCell>
       <TableHeadCell>Nickname</TableHeadCell>
-      <TableHeadCell>Email</TableHeadCell>
       <TableHeadCell>Address</TableHeadCell>
       <TableHeadCell>Account state</TableHeadCell>
     </TableHead>
@@ -87,6 +85,7 @@
       <TableBodyRow>
         <TableBodyCell>
           <Input
+            readonly={user.accountState === 1 ? 'true' : 'false'}
             type="text"
             id="name"
             placeholder="Name"
@@ -105,6 +104,7 @@
         >
         <TableBodyCell>
           <Input
+            readonly={user.accountState === 1 ? 'true' : 'false'}
             type="text"
             id="nationalIdNumber"
             placeholder="National ID Number"
@@ -114,6 +114,7 @@
         >
         <TableBodyCell>
           <Input
+            readonly={user.accountState === 1 ? 'true' : 'false'}
             type="text"
             id="nickname"
             placeholder="Nickname"
@@ -123,15 +124,7 @@
         >
         <TableBodyCell>
           <Input
-            type="text"
-            id="email"
-            placeholder="Email"
-            required
-            bind:value={user.email}
-          /></TableBodyCell
-        >
-        <TableBodyCell>
-          <Input
+            readonly={user.accountState === 1 ? 'true' : 'false'}
             type="text"
             id="address"
             placeholder="Address"
@@ -141,7 +134,6 @@
         >
         <TableBodyCell>{AccountState[user.accountState]}</TableBodyCell>
       </TableBodyRow>
-
       <TableBodyRow />
     </TableBody>
   </Table>
