@@ -21,7 +21,7 @@
   import { AccountRole } from "../enums/AccountRole";
   import BookRow from "../components/Books/BookRow.svelte";
   import NewBookRow from "../components/Books/NewBookRow.svelte";
-  import type { Writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
   import { notifications } from "../tools/notifications";
   import Toast from "../components/Toast.svelte";
   import { BooksRepository } from "../repositories/BooksRepository";
@@ -138,6 +138,48 @@
           break;
       }
     }
+  }
+
+  let search = writable<IBook>({
+    _id: null,
+    author: null,
+    name: null,
+    releaseYear: null,
+    pagesCount: null,
+    img: null,
+    borrowedCount: null,
+    availableCount: null,
+  });
+
+  async function querySearch(): Promise<void> {
+    if (
+      $search.name.length < 3 ||
+      $search.author.length < 3 ||
+      $search.releaseYear.toString().length < 3
+    ){
+      notifications.info(
+        "Search parameters must have at least three characters",
+        3000
+      );
+      return;
+    }
+      const searchQuery = {
+        $or: [
+          { author: { $regex: `.*${$search.author}.*`, $options: "i" } },
+          { name: { $regex: `.*${$search.name}.*`, $options: "i" } },
+          {
+            releaseYear: {
+              $regex: `.*${$search.releaseYear}.*`,
+              $options: "i",
+            },
+          },
+        ],
+      };
+
+    const data = mongo.collection(MongoCollections.Books);
+    const result = (await data.find(searchQuery)) as Book[];
+    books = result;
+    updateBooks();
   }
 
   function onSectionChanged(section: String) {
@@ -271,12 +313,31 @@
 </ButtonGroup>
 <div>
   <div class="h-12" />
-  <Input
-    type="text"
-    id="search"
-    placeholder="Search..."
-    on:change={(e) => onSearchChanged(e)}
-  />
+  <div class="flex flex-row justify-between gap-4">
+    <Input
+      minlength="3"
+      bind:value={$search.name}
+      type="text"
+      id="name"
+      placeholder="Bible"
+    />
+    <Input
+      minlength="3"
+      bind:value={$search.author}
+      type="text"
+      id="author"
+      placeholder="Jaro Kroupa"
+    />
+
+    <Input
+      minlength="3"
+      bind:value={$search.releaseYear}
+      type="text"
+      id="releaseYear"
+      placeholder="1995"
+    />
+    <Button on:click={querySearch}>Search</Button>
+  </div>
 </div>
 <div class="h-24" />
 {#if !isLoading}
