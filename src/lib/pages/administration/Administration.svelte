@@ -1,9 +1,6 @@
 <script lang="ts">
   import {
     Button,
-    ButtonGroup,
-    Dropdown,
-    DropdownItem,
     Input,
     Label,
     Radio,
@@ -26,7 +23,6 @@
   } from 'flowbite-svelte';
   import { AccountRole } from '../../enums/AccountRole';
   import { AccountState } from '../../enums/AccountState';
-  import * as fsPromise from 'fs/promises';
 
   let isLoading = true;
   const {
@@ -47,16 +43,16 @@
     isLoading = false;
   }
 
-  async function download(fileName, contentType) {
+  async function download() {
     const users = mongo.collection(MongoCollections.Users);
     var result = await users.find();
     const data = JSON.stringify(result);
     console.log(data);
 
     var a = document.createElement('a');
-    var file = new Blob([data], { type: contentType });
+    var file = new Blob([data], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
-    a.download = fileName;
+    a.download = 'json.txt';
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -183,8 +179,7 @@
   <Button type="submit" color="yellow" on:click={onSubmit}>Submit</Button>
 </form>
 
-<Button on:click={() => download('json.txt', 'text/plain')}>Export users</Button
->
+<Button on:click={() => download()}>Export users</Button>
 
 <div class="flex flex-row justify-between">
   <h1 class="text-black">Users</h1>

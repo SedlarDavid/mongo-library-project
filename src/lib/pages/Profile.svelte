@@ -61,7 +61,7 @@
           },
         }
       );
-    getUser();
+    await getUser();
   }
 </script>
 
