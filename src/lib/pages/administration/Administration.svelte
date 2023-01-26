@@ -86,10 +86,12 @@
 
   async function OnUsersSearch() {
     getSearchedUsers(searchedUser);
+    isLoading = false;
   }
 
   async function OnReset() {
     await getUsers();
+    isLoading = false;
   }
 
   async function download() {
