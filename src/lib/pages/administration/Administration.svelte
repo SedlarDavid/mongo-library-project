@@ -138,9 +138,9 @@
     const data = JSON.stringify(result);
 
     var a = document.createElement('a');
-    var file = new Blob([data], { type: 'text/plain' });
+    var file = new Blob([data], { type: 'appliaction/json' });
     a.href = URL.createObjectURL(file);
-    a.download = 'users.txt';
+    a.download = 'users.json';
     a.click();
     URL.revokeObjectURL(a.href);
   }
