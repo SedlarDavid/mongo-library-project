@@ -29,7 +29,6 @@ export class Book {
     releaseYear: number,
     img: string,
     availableCount: number,
-    //TODO from sum ATLAS function
     borrowedCount: number
   ) {
     this._id = _id;
