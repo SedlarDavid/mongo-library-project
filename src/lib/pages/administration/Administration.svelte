@@ -19,7 +19,6 @@
   } from 'flowbite-svelte';
   import { AccountRole } from '../../enums/AccountRole';
   import { AccountState } from '../../enums/AccountState';
-  import Login from '../Login.svelte';
 
   const mongo = realmApp.currentUser
     .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
@@ -59,15 +58,13 @@
         password,
       });
 
-      for (const userId in realmApp.allUsers) {
-        const user = realmApp.allUsers[userId];
-        if (user.profile.email === email) {
-          $registerUserFormData.personalId = userId;
-          console.log(userId);
-        }
-      }
+      const credentials = Realm.Credentials.emailPassword(email, password);
+      const user = await realmApp.logIn(credentials);
+      $registerUserFormData.personalId = user.id;
+      console.log(user.id);
 
       createUserData();
+      realmApp.currentUser.logOut();
     } catch (err) {
       console.error('Failed to create user', err);
     }
@@ -253,6 +250,10 @@
       );
     };
     reader.readAsText(file);
+  }
+
+  function loginEmailPassword(email: any, password: any) {
+    throw new Error('Function not implemented.');
   }
 </script>
 
