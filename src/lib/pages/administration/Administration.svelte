@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { Button, Input, Label, Spinner } from "flowbite-svelte";
+  import { Button, Input, Label, Spinner } from 'flowbite-svelte';
 
   import * as Realm from 'realm-web';
-  import {  realmApp } from '../../../main';
+  import { realmApp } from '../../../main';
   import { Constants, MongoCollections } from '../../../Constants';
   import { onMount } from 'svelte';
-  import { UserData } from '../../models/UserData/UserData';
+  import {
+    registerUserFormData,
+    UserData,
+  } from '../../models/UserData/UserData';
   import {
     Table,
     TableBody,
@@ -16,7 +19,6 @@
   } from 'flowbite-svelte';
   import { AccountRole } from '../../enums/AccountRole';
   import { AccountState } from '../../enums/AccountState';
-  import Login from '../Login.svelte';
 
   const mongo = realmApp.currentUser
     .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
@@ -48,6 +50,38 @@
   );
   let isFormOpen = false;
   let canSeePage = false;
+
+  async function registerEmailPassword(email, password) {
+    try {
+      await realmApp.emailPasswordAuth.registerUser({
+        email,
+        password,
+      });
+
+      const credentials = Realm.Credentials.emailPassword(email, password);
+      const user = await realmApp.logIn(credentials);
+      $registerUserFormData.personalId = user.id;
+      console.log(user.id);
+
+      createUserData();
+      realmApp.currentUser.logOut();
+    } catch (err) {
+      console.error('Failed to create user', err);
+    }
+  }
+
+  async function createUserData() {
+    const mongo = realmApp.currentUser.mongoClient(
+      import.meta.env.VITE_DATA_SOURCE_NAME
+    );
+    const users = mongo
+      .db(Constants.DatabaseName)
+      .collection(MongoCollections.Users);
+
+    const result = await users.insertOne(
+      UserData.fromFormData($registerUserFormData)
+    );
+  }
 
   async function getCurrentUserInfo() {
     const data = mongo.collection(MongoCollections.Users);
@@ -94,8 +128,6 @@
   }
 
   async function OnReset() {
-    /*var allUsers = realmApp.allUsers;
-    console.log(allUsers);*/
     await getUsers();
     isLoading = false;
   }
@@ -105,8 +137,8 @@
     var result = await users.find();
     const data = JSON.stringify(result);
 
-    var a = document.createElement("a");
-    var file = new Blob([data], { type: "text/plain" });
+    var a = document.createElement('a');
+    var file = new Blob([data], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
     a.download = 'users.txt';
     a.click();
@@ -183,8 +215,23 @@
     await getUsers();
   }
 
+  function generateRandomString(length: number): string {
+    let result = '';
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    return result;
+  }
+
   async function onSubmit(_e) {
     isLoading = true;
+    var password = generateRandomString(10);
+    await registerEmailPassword($registerUserFormData.email, password);
+    await getUsers();
   }
 
   var jsonData;
@@ -214,9 +261,6 @@
   </div>
 </div>
 <div class="h-12" />
-<Button on:click={() => (isFormOpen = !isFormOpen)}>
-  {isFormOpen ? "Close" : "Open"} form to create new user
-</Button>
 {#if canSeePage}
   <Button on:click={() => (isFormOpen = !isFormOpen)}>
     {isFormOpen ? 'Close' : 'Open'} form to create new user
@@ -229,11 +273,23 @@
     <div class="grid gap-6 mb-6 md:grid-cols-2">
       <div>
         <Label for="name" class="mb-2 text-white">Name</Label>
-        <Input type="text" id="name" placeholder="Name" required />
+        <Input
+          type="text"
+          id="name"
+          placeholder="Name"
+          required
+          bind:value={$registerUserFormData.name}
+        />
       </div>
       <div>
         <Label for="surname" class="mb-2 text-white">Surname</Label>
-        <Input type="text" id="surname" placeholder="Doe" required />
+        <Input
+          type="text"
+          id="surname"
+          placeholder="Doe"
+          required
+          bind:value={$registerUserFormData.surname}
+        />
       </div>
       <div>
         <Label for="nationalIdNumber" class="mb-2 text-white"
@@ -244,11 +300,18 @@
           id="nationalIdNumber"
           placeholder="981205/5578"
           required
+          bind:value={$registerUserFormData.nationalIdNumber}
         />
       </div>
       <div>
         <Label for="address" class="mb-2 text-white">Address</Label>
-        <Input type="text" id="address" placeholder="Na Stráni 553" required />
+        <Input
+          type="text"
+          id="address"
+          placeholder="Na Stráni 553"
+          required
+          bind:value={$registerUserFormData.address}
+        />
       </div>
     </div>
     <div class="mb-6">
@@ -258,6 +321,7 @@
         id="email"
         placeholder="john.doe@company.com"
         required
+        bind:value={$registerUserFormData.email}
       />
     </div>
     <Button type="submit" color="yellow" on:click={onSubmit}>Submit</Button>

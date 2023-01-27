@@ -6,6 +6,13 @@
   import Administration from './lib/pages/administration/Administration.svelte';
   import Books from './lib/pages/Books.svelte';
   import Profile from './lib/pages/Profile.svelte';
+  import { Button } from 'flowbite-svelte';
+  import { realmApp } from './main';
+
+  async function onLogout() {
+    await realmApp.currentUser.logOut();
+    location.reload();
+  }
 </script>
 
 <Router>
@@ -16,6 +23,9 @@
       <Link to="register">Register</Link>
       <Link to="administration">Administration</Link>
       <Link to="profile">Profile</Link>
+      {#if realmApp.currentUser != null}
+        <Button on:click={() => onLogout()}>Logout</Button>
+      {/if}
     </nav>
   </header>
 
