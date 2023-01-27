@@ -6,6 +6,7 @@
     Fileupload,
     Input,
     Label,
+    Select,
     Spinner,
     Table,
     TableBody,
@@ -38,6 +39,7 @@
 
   let isLoading = true;
   var user: UserData;
+  var users: UserData[];
   var selectedSection: String = "All";
   const {
     BSON: { ObjectId },
@@ -77,6 +79,7 @@
   async function getCurrentUser() {
     const data = mongo.collection(MongoCollections.Users);
     const result = (await data.find()) as UserData[];
+    users = result;
     user = result.find((u) => u.personalId === realmApp.currentUser.id);
   }
 
@@ -320,12 +323,46 @@
     };
     reader.readAsText(file);
   }
+  import { modal } from "../stores.js";
+  import Dialog from "../components/Dialog.svelte";
+
+  let showModal = false;
+
+  let selectedUser;
+  let selectedBook;
+
+  function assignBooksToUsers(): void {
+    var book =   books.find((b) => b._id.toString() === selectedBook);
+    if(book.availableCount ===0 ){
+      notifications.warning(
+        "Book has no free copies left!",
+        3000
+      );
+      return;
+    }
+    BooksRepository.borrowBookToUser(
+    book,
+      selectedUser
+    );
+  }
 </script>
 
 <div class="flex flex-row justify-between">
   <h1 class="text-black">Books</h1>
   <div>
-    <Button on:click={exportBooks}>Export books data</Button>
+    <div class="flex flex-column justify-between gap-2">
+      <Button on:click={exportBooks}>Export books data</Button>
+
+      <Button
+        on:click={() => {
+          if (user.role !== AccountRole.Admin) {
+            return;
+          }
+          showModal = true;
+        }}>Assign books to users</Button
+      >
+    </div>
+
     <br />
     <Label for="import">Upload file to import:</Label>
     <input type="file" on:change={handleFile} />
@@ -417,3 +454,30 @@
 {/if}
 
 <Toast />
+
+{#if showModal}
+  <Dialog on:close={() => (showModal = false)} onClose={assignBooksToUsers}>
+    <Label
+      >Select an user
+      <Select
+        class="mt-2"
+        items={users.map((currentValue) => ({
+          value: currentValue.personalId,
+          name: currentValue.name,
+        }))}
+        bind:value={selectedUser}
+      />
+    </Label>
+    <Label
+      >Select a book
+      <Select
+        class="mt-2"
+        items={books.map((currentValue) => ({
+          value: currentValue._id.toString(),
+          name: currentValue.name,
+        }))}
+        bind:value={selectedBook}
+      />
+    </Label>
+  </Dialog>
+{/if}

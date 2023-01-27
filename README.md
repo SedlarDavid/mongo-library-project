@@ -15,32 +15,27 @@
 - [x] List borrowed books
 - [x] List borrow history
 - [x] Search on books
-- [ ] Data export
+- [x] Data export
 
 #### Account / Users - @SadilekJ
 - [x] User - edit personal info without personal id
-- [ ] User - password change
-- [ ] Librarian - create user
-- [ ] Librarian - ban user
-- [ ] Librarian - edit user without personal id
-- [ ] Librarian - change account state
-- [ ] Data export
+- [x] User - password change
+- [x] Librarian - create user
+- [x] Librarian - ban user
+- [x] Librarian - edit user without personal id
+- [x] Librarian - change account state
+- [x] Data export
 
 #### Authentication
 - [x] Login - @SadilekJ
 - [x] Registration - @SedlarDavid
+- [x] Logout
 
+### Additionals
 
-### TODO
-DJW 
-- [x] import
-- [ ] rozrazeni knih userum
-- [ ] check na jen user vypujcky
-- [x] cant borrow if innnactive
-- [x] search na books
-
-HNS
-- [ ] search - 3 chars
-- [ ] autorizace a visibilita menu
-- [ ] create user - API endpoints, idk...
-- [ ] cant edit user data if innactive
+- [x] Import of Data
+- [x] Librarian - assign books to users
+- [x] Show your borrowings
+- [x] Can't borrow if innnactive
+- [x] Search na books
+- [x] Can't edit user data if innactive
