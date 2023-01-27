@@ -33,7 +33,7 @@
 
 ### TODO
 DJW 
-- [ ] import
+- [x] import
 - [ ] rozrazeni knih userum
 - [ ] check na jen user vypujcky
 - [x] cant borrow if innnactive

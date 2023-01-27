@@ -3,6 +3,7 @@
     Avatar,
     Button,
     ButtonGroup,
+    Fileupload,
     Input,
     Label,
     Spinner,
@@ -28,6 +29,7 @@
   import { Book, type IBook } from "../models/Books/Book";
   import type { Borrow } from "../models/Borrowings/Borrow";
   import type { Return } from "../models/Borrowings/Return";
+  import { ImportRepository } from "../repositories/ImportRepository";
   import { AccountState } from "../enums/AccountState";
 
   const mongo = realmApp.currentUser
@@ -300,11 +302,34 @@
     a.click();
     URL.revokeObjectURL(a.href);
   }
+
+  var jsonData;
+  function handleFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const contents = event.target.result;
+      // do something with the contents
+      console.log(contents);
+      jsonData = JSON.parse(contents as string);
+
+      (jsonData as Array<object>).forEach((obj) =>
+        BooksRepository.importBookData(obj)
+      );
+    };
+    reader.readAsText(file);
+  }
 </script>
 
 <div class="flex flex-row justify-between">
   <h1 class="text-black">Books</h1>
-  <Button on:click={exportBooks}>Export books data</Button>
+  <div>
+    <Button on:click={exportBooks}>Export books data</Button>
+    <br />
+    <Label for="import">Upload file to import:</Label>
+    <input type="file" on:change={handleFile} />
+  </div>
 </div>
 <div class="h-12" />
 <ButtonGroup>
