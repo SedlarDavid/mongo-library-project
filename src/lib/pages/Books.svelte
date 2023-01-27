@@ -65,13 +65,11 @@
     isLoading = false;
   }
   async function getBorrowings() {
-    //TODO user filter
     const data = mongo.collection(MongoCollections.Borrowings);
     const result = (await data.find()) as Borrow[];
     borrowings = result;
   }
   async function getReturns() {
-    //TODO user filter
     const data = mongo.collection(MongoCollections.BorrowHistory);
     const result = (await data.find()) as Return[];
     returns = result;
@@ -83,7 +81,7 @@
     user = result.find((u) => u.personalId === realmApp.currentUser.id);
   }
 
-  function onBorrowOrReturnBook(id: string, data: IBook): void {
+  async function onBorrowOrReturnBook(id: string, data: IBook): Promise<void> {
     if (user.accountState === AccountState.Inactive) {
       notifications.danger(
         "Innactive users cannot borrow books, please refer to your librarian!",
@@ -108,15 +106,18 @@
     if (
       isBorrowed(renderBooks.find((b) => b._id.toString() === id.toString()))
     ) {
-      BooksRepository.returnBook(id, data);
+      await BooksRepository.returnBook(id, data);
+      location.reload();
       return;
     }
 
     if (renderBooks.find((b) => b._id === id).availableCount === 0) {
       notifications.warning("No books left to borrow!", 3000);
     } else {
-      BooksRepository.borrowBook(id, data);
+      await BooksRepository.borrowBook(id, data);
     }
+
+    location.reload();
   }
   function isBorrowed(book: Book): boolean {
     return (
@@ -168,9 +169,9 @@
 
   async function querySearch(): Promise<void> {
     if (
-      $search.name.length < 3 ||
-      $search.author.length < 3 ||
-      $search.releaseYear.toString().length < 3
+      ($search.name?.length < 3 ?? 0) &&
+      ($search.author?.length ?? 0) < 3 &&
+      ($search.releaseYear?.toString()?.length ?? 0) < 3
     ) {
       notifications.info(
         "Search parameters must have at least three characters",
@@ -241,7 +242,6 @@
     return arr;
   }
 
-  //TODO handle via CRON/Function/trigger
   function getBookExpirationDate(book: Book): string {
     let bor = borrowings.find(
       (b) => b.bookId.toString() === book._id.toString()
@@ -332,18 +332,12 @@
   let selectedBook;
 
   function assignBooksToUsers(): void {
-    var book =   books.find((b) => b._id.toString() === selectedBook);
-    if(book.availableCount ===0 ){
-      notifications.warning(
-        "Book has no free copies left!",
-        3000
-      );
+    var book = books.find((b) => b._id.toString() === selectedBook);
+    if (book.availableCount === 0) {
+      notifications.warning("Book has no free copies left!", 3000);
       return;
     }
-    BooksRepository.borrowBookToUser(
-    book,
-      selectedUser
-    );
+    BooksRepository.borrowBookToUser(book, selectedUser);
   }
 </script>
 

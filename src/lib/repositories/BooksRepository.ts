@@ -10,80 +10,77 @@ const {
 } = Realm;
 
 export class BooksRepository {
-  static importBookData(bookData: object) {
+  static async importBookData(bookData: object) {
     let mongo = realmApp.currentUser
       .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
       .db(Constants.DatabaseName);
-    mongo.collection(MongoCollections.Books).insertOne(bookData);
+    await mongo.collection(MongoCollections.Books).insertOne(bookData);
   }
 
-  static returnBook(id: string, data: IBook): void {
+  static async returnBook(id: string, data: IBook): Promise<void> {
     let mongo = realmApp.currentUser
       .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
       .db(Constants.DatabaseName);
     data.availableCount++;
     data.borrowedCount--;
-    mongo
+    await mongo
       .collection(MongoCollections.Books)
       .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
-    //TODO via Trigger
-    mongo.collection(MongoCollections.Borrowings).deleteOne({
+
+    await mongo.collection(MongoCollections.Borrowings).deleteOne({
       bookId: new ObjectId(id),
       userId: realmApp.currentUser.id,
     });
-    mongo
+    await mongo
       .collection(MongoCollections.BorrowHistory)
       .insertOne(new Return(id, realmApp.currentUser.id, new Date()));
   }
-  static deleteBook(id: string): void {
+  static async deleteBook(id: string): Promise<void> {
     let mongo = realmApp.currentUser
       .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
       .db(Constants.DatabaseName);
-    mongo.collection(MongoCollections.Books).deleteOne({
+    await mongo.collection(MongoCollections.Books).deleteOne({
       _id: new ObjectId(id.toString()),
     });
-
-    //TODO update borrowings / returns via trigger
   }
 
-  static borrowBook(id: string, data: IBook): void {
+  static async borrowBook(id: string, data: IBook): Promise<void> {
     let mongo = realmApp.currentUser
       .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
       .db(Constants.DatabaseName);
     data.availableCount--;
     data.borrowedCount++;
-    mongo
+    await mongo
       .collection(MongoCollections.Books)
       .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
-    //TODO via Trigger
-    mongo
+
+    await mongo
       .collection(MongoCollections.Borrowings)
       .insertOne(new Borrow(id, realmApp.currentUser.id, new Date()));
   }
 
-  static borrowBookToUser(book: Book, userId: string): void {
+  static async borrowBookToUser(book: Book, userId: string): Promise<void> {
     let mongo = realmApp.currentUser
       .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
       .db(Constants.DatabaseName);
     book.availableCount--;
     book.borrowedCount++;
-    mongo
+    await mongo
       .collection(MongoCollections.Books)
       .updateOne(
         { _id: new ObjectId(book._id.toString()) },
         { $set: Book.fromFormData(book) }
       );
-    //TODO via Trigger
-    mongo
+    await mongo
       .collection(MongoCollections.Borrowings)
       .insertOne(new Borrow(book._id.toString(), userId, new Date()));
   }
 
-  static saveBookChanges(id: string, data: IBook): void {
+  static async saveBookChanges(id: string, data: IBook): Promise<void> {
     let mongo = realmApp.currentUser
       .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
       .db(Constants.DatabaseName);
-    mongo
+    await mongo
       .collection(MongoCollections.Books)
       .updateOne({ _id: id }, { $set: Book.fromFormData(data) });
   }
