@@ -138,7 +138,7 @@
     const data = JSON.stringify(result);
 
     var a = document.createElement('a');
-    var file = new Blob([data], { type: 'appliaction/json' });
+    var file = new Blob([data], { type: 'application/json' });
     a.href = URL.createObjectURL(file);
     a.download = 'users.json';
     a.click();
