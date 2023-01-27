@@ -61,6 +61,24 @@ export class BooksRepository {
       .insertOne(new Borrow(id, realmApp.currentUser.id, new Date()));
   }
 
+  static borrowBookToUser(book: Book, userId: string): void {
+    let mongo = realmApp.currentUser
+      .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)
+      .db(Constants.DatabaseName);
+    book.availableCount--;
+    book.borrowedCount++;
+    mongo
+      .collection(MongoCollections.Books)
+      .updateOne(
+        { _id: new ObjectId(book._id.toString()) },
+        { $set: Book.fromFormData(book) }
+      );
+    //TODO via Trigger
+    mongo
+      .collection(MongoCollections.Borrowings)
+      .insertOne(new Borrow(book._id.toString(), userId, new Date()));
+  }
+
   static saveBookChanges(id: string, data: IBook): void {
     let mongo = realmApp.currentUser
       .mongoClient(import.meta.env.VITE_DATA_SOURCE_NAME)

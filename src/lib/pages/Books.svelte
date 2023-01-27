@@ -330,14 +330,20 @@
 
   let selectedUser;
   let selectedBook;
-  let countries = [
-    { value: "us", name: "United States" },
-    { value: "ca", name: "Canada" },
-    { value: "fr", name: "France" },
-  ];
 
   function assignBooksToUsers(): void {
-    console.log("ok");
+    var book =   books.find((b) => b._id.toString() === selectedBook);
+    if(book.availableCount ===0 ){
+      notifications.warning(
+        "Book has no free copies left!",
+        3000
+      );
+      return;
+    }
+    BooksRepository.borrowBookToUser(
+    book,
+      selectedUser
+    );
   }
 </script>
 
@@ -347,12 +353,14 @@
     <div class="flex flex-column justify-between gap-2">
       <Button on:click={exportBooks}>Export books data</Button>
 
-      <Button on:click={() => {
-        if(user.role !== AccountRole.Admin){
-          return;
-        }
-        (showModal = true);
-      }}>Assign books to users</Button>
+      <Button
+        on:click={() => {
+          if (user.role !== AccountRole.Admin) {
+            return;
+          }
+          showModal = true;
+        }}>Assign books to users</Button
+      >
     </div>
 
     <br />
@@ -465,7 +473,7 @@
       <Select
         class="mt-2"
         items={books.map((currentValue) => ({
-          value: currentValue._id,
+          value: currentValue._id.toString(),
           name: currentValue.name,
         }))}
         bind:value={selectedBook}
