@@ -251,10 +251,6 @@
     };
     reader.readAsText(file);
   }
-
-  function loginEmailPassword(email: any, password: any) {
-    throw new Error('Function not implemented.');
-  }
 </script>
 
 <div class="flex flex-row justify-between">
